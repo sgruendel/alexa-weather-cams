@@ -5,11 +5,11 @@
       "was_cloned": true,
       "resources": {
         "manifest": {
-          "eTag": "309dc95c1901fa10afc37b5f9f3866aa"
+          "eTag": "cb5b8d56c04d7c0586d970e4e60dada1"
         },
         "interactionModel": {
           "de-DE": {
-            "eTag": "148ff9c3fd007dd6738963394ff560cf"
+            "eTag": "7e9dbe209b9827060bf7ef8459ac5071"
           }
         },
         "lambda": [
@@ -20,7 +20,7 @@
             "alexaUsage": [
               "custom/default"
             ],
-            "revisionId": "2e608313-cb82-42d7-8df6-4d8f084343d0"
+            "revisionId": "f077d3e8-226d-46b7-bd3c-101ac6a730fc"
           }
         ]
       },

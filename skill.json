@@ -3,9 +3,28 @@
     "publishingInformation": {
       "locales": {
         "de-DE": {
-          "name": "Weather Cams"
+          "summary": "Öffentliche Wetter Kameras vom DWD",
+          "examplePhrases": [
+            "Alexa, öffne Wetter Kamera",
+            "Alexa, öffne Wetter Kamera für Hamburg elbabwärts",
+            "Alexa, öffne Wetter Kamera in Schmücke"
+          ],
+          "keywords": [
+            "dwd",
+            "webcam",
+            "wetter",
+            "kamera"
+          ],
+          "name": "Wetter Kamera",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/893f/31dea8aa14cc4f7ba9be784a8a72003c/APP_ICON?versionId=lh7WXm3I80FvrfinqBQtkuT0rwrch6lU&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1541679620&Signature=crL21vIEab6KdB%2FUHymYymMKt70%3D",
+          "description": "Dieser Skill funktioniert NUR sinnvoll mit dem Echo Show oder Echo Spot.\n\nEs werden die aktuellen Aufnahmen der öffentlichen Wetterkameras vom DWD angezeigt, Aufruf über\n\"Alexa, öffne Wetter Kamera für Hamburg elbabwärts\"\noder\n\"Alexa, öffne Wetter Kamera in Schmücke\"\n\nQuelle: Deutscher Wetterdienst\n\nVerbesserungsvorschläge und Feedback gerne unter https://github.com/sgruendel/alexa-weather-cams/issues/new.",
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/2c34/e7f4c5d51a5e463dba6c6163678bea4c/APP_ICON_LARGE?versionId=EqD0FGbr3yG09f1kuUOHKUVb_oJiEhiy&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1541679620&Signature=AjQX9huZdS%2Fs7%2BGcYDpP2ttvJas%3D"
         }
-      }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Aktuelle Bilder siehe https://www.dwd.de/DE/wetter/wetterundklima_vorort/wetterkameras/wetter_cams.html",
+      "category": "WEATHER",
+      "distributionCountries": []
     },
     "apis": {
       "custom": {
@@ -20,6 +39,13 @@
         ]
       }
     },
-    "manifestVersion": "1.0"
+    "manifestVersion": "1.0",
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "isExportCompliant": true,
+      "containsAds": false,
+      "isChildDirected": false,
+      "usesPersonalInfo": false
+    }
   }
 }
