@@ -7,10 +7,11 @@ const dashbot = process.env.DASHBOT_API_KEY ? require('dashbot')(process.env.DAS
 const winston = require('winston');
 
 const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
+    level: process.env.LOG_LEVEL || 'info',
     transports: [
-        new winston.transports.Console({ format: winston.format.simple() }),
+        new winston.transports.Console({
+            format: winston.format.simple(),
+        }),
     ],
     exitOnError: false,
 });
@@ -18,11 +19,12 @@ const logger = winston.createLogger({
 const SKILL_ID = 'amzn1.ask.skill.6896cced-41a6-4134-912d-c74db2be8559';
 const ER_SUCCESS_MATCH = 'ER_SUCCESS_MATCH';
 const ER_SUCCESS_NO_MATCH = 'ER_SUCCESS_NO_MATCH';
+const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
 
 const languageStrings = {
     de: {
         translation: {
-            HELP_MESSAGE: 'Du kannst sagen „Frage Wetter Kamera bach Hamburg elbabwärts“, oder du kannst „Beenden“ sagen. Wie kann ich dir helfen?',
+            HELP_MESSAGE: 'Du kannst sagen „Frage Wetter Kamera nach Hamburg elbabwärts“, oder du kannst „Beenden“ sagen. Wie kann ich dir helfen?',
             HELP_REPROMPT: 'Wie kann ich dir helfen?',
             STOP_MESSAGE: '<say-as interpret-as="interjection">bis dann</say-as>.',
         },
@@ -48,28 +50,28 @@ const WeatherCamIntentHandler = {
         const { request } = handlerInput.requestEnvelope;
         // delegate to Alexa to collect all the required slots
         if (request.dialogState && request.dialogState !== 'COMPLETED') {
-            console.log('dialog state is', request.dialogState, '=> adding delegate directive');
+            logger.debug('dialog state is ' + request.dialogState + ' => adding delegate directive');
             return handlerInput.responseBuilder
                 .addDelegateDirective()
                 .getResponse();
         }
 
         const { slots } = request.intent;
-        logger.info('webcam', JSON.stringify(slots.webcam));
+        logger.debug('webcam slot', slots.webcam);
 
         const rpa = slots.webcam
             && slots.webcam.resolutions
             && slots.webcam.resolutions.resolutionsPerAuthority[0];
         switch (rpa.status.code) {
         case ER_SUCCESS_NO_MATCH:
-            logger.error('no match for webcam', slots.webcam.value);
+            logger.error('no match for webcam ' + slots.webcam.value);
             return handlerInput.responseBuilder
                 .speak('Ich kenne diese Kamera leider nicht.')
                 .getResponse();
 
         case ER_SUCCESS_MATCH:
             if (rpa.values.length > 1) {
-                logger.error('multiple matches', slots.webcam.value);
+                logger.info('multiple matches for ' + slots.webcam.value);
                 var prompt = 'Welche Kamera';
                 const size = rpa.values.length;
 
@@ -78,25 +80,26 @@ const WeatherCamIntentHandler = {
                 });
 
                 prompt += '?';
+                logger.info('eliciting webcam slot: ' + prompt);
                 return handlerInput.responseBuilder
                     .speak(prompt)
                     .reprompt(prompt)
-                    .addElicitSlotDirective(slots.station.name)
+                    .addElicitSlotDirective(slots.webcam.name)
                     .getResponse();
             }
             break;
 
         default:
-            logger.error('unexpected status code', rpa.status.code);
+            logger.error('unexpected status code ' + rpa.status.code);
         }
 
         const value = rpa.values[0].value;
-        logger.info('value', value);
+        logger.info('webcam value', value);
 
         const baseUrl = 'https://opendata.dwd.de/weather/webcam/' + value.id + '/' + value.id + '_latest_';
         if (supportsDisplay(handlerInput)) {
             const webcamImage = new Alexa.ImageHelper()
-                .withDescription('Wasserstandsdaten')
+                .withDescription(COPYRIGHT)
                 .addImageInstance(baseUrl + '400.jpg', 'X_SMALL', 400, 225)
                 .addImageInstance(baseUrl + '640.jpg', 'SMALL', 640, 360)
                 .addImageInstance(baseUrl + '816.jpg', 'MEDIUM', 816, 459)
@@ -114,7 +117,7 @@ const WeatherCamIntentHandler = {
 
         return handlerInput.responseBuilder
             .speak('Hier ist die Kamera ' + value.name + '.')
-            .withStandardCard(value.name, 'exif data :)', 'https://opendata.dwd.de/weather/webcam/' + value.id + '/' + value.id + '_latest_180.jpg')
+            .withStandardCard(value.name, COPYRIGHT, baseUrl + '114.jpg', baseUrl + '180.jpg')
             .getResponse();
     },
 };
@@ -156,7 +159,7 @@ const SessionEndedRequestHandler = {
         return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
     },
     handle(handlerInput) {
-        logger.info('Session ended with reason:', handlerInput.requestEnvelope.request.reason);
+        logger.info('Session ended with reason: ' + handlerInput.requestEnvelope.request.reason);
         return handlerInput.responseBuilder.getResponse();
     },
 };
@@ -166,10 +169,10 @@ const ErrorHandler = {
         return true;
     },
     handle(handlerInput, error) {
-        logger.error('Error handled:', error);
+        logger.error('unhandled error', { message: error.message, stack: error.stack });
         return handlerInput.responseBuilder
-            .speak('Entschuldigung, das verstehe ich nicht. Bitte wiederholen Sie das?')
-            .reprompt('Entschuldigung, das verstehe ich nicht. Bitte wiederholen Sie das?')
+            .speak('Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?')
+            .reprompt('Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?')
             .getResponse();
     },
 };
