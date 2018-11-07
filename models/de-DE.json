@@ -1,0 +1,139 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "wetter kamera",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "WeatherCamIntent",
+          "slots": [
+            {
+              "name": "webcam",
+              "type": "LIST_OF_WEBCAMS",
+              "samples": [
+                "{webcam}"
+              ]
+            }
+          ],
+          "samples": [
+            "nach der Kamera {webcam}",
+            "der Kamera {webcam}",
+            "{webcam}"
+          ]
+        },
+        {
+          "name": "AMAZON.MoreIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateSettingsIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PreviousIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollRightIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollLeftIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollUpIntent",
+          "samples": []
+        }
+      ],
+      "types": [
+        {
+          "values": [
+            {
+              "id": "Hamburg-SW",
+              "name": {
+                "value": "Hamburg Südwest",
+                "synonyms": [
+                  "Hamburg elbabwärts",
+                  "Hamburg Blickrichtung Südwest"
+                ]
+              }
+            },
+            {
+              "id": "Hamburg-SO",
+              "name": {
+                "value": "Hamburg Südost",
+                "synonyms": [
+                  "Hamburg elbaufwärts",
+                  "Hamburg Blickrichtung Südost"
+                ]
+              }
+            }
+          ],
+          "name": "LIST_OF_WEBCAMS"
+        }
+      ]
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "WeatherCamIntent",
+          "confirmationRequired": false,
+          "slots": [
+            {
+              "name": "webcam",
+              "type": "LIST_OF_WEBCAMS",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.149826922917.1009067625554"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.149826922917.1009067625554",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Welche Kamera?"
+          }
+        ]
+      }
+    ]
+  }
+}
