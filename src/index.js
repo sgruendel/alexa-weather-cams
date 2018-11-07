@@ -24,8 +24,8 @@ const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
 const languageStrings = {
     de: {
         translation: {
-            HELP_MESSAGE: 'Du kannst sagen „Frage Wetter Kamera nach Hamburg elbabwärts“, oder du kannst „Beenden“ sagen. Wie kann ich dir helfen?',
-            HELP_REPROMPT: 'Wie kann ich dir helfen?',
+            HELP_MESSAGE: 'Du kannst sagen „Frage Wetter Kamera nach Hamburg elbabwärts“, oder du kannst „Beenden“ sagen. Was soll ich tun?',
+            HELP_REPROMPT: 'Was soll ich tun?',
             STOP_MESSAGE: '<say-as interpret-as="interjection">bis dann</say-as>.',
         },
     },
