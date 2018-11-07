@@ -31,9 +31,19 @@
             }
           ],
           "samples": [
-            "nach der Kamera {webcam}",
+            "{webcam}",
+            "für {webcam}",
+            "in {webcam}",
+            "mit {webcam}",
+            "von {webcam}",
             "der Kamera {webcam}",
-            "{webcam}"
+            "der Kamera für {webcam}",
+            "der Kamera in {webcam}",
+            "der Kamera von {webcam}",
+            "nach der Kamera {webcam}",
+            "nach der Kamera für {webcam}",
+            "nach der Kamera in {webcam}",
+            "nach der Kamera von {webcam}"
           ]
         },
         {
@@ -79,29 +89,117 @@
       ],
       "types": [
         {
+          "name": "LIST_OF_WEBCAMS",
           "values": [
-            {
-              "id": "Hamburg-SW",
-              "name": {
-                "value": "Hamburg Südwest",
-                "synonyms": [
-                  "Hamburg elbabwärts",
-                  "Hamburg Blickrichtung Südwest"
-                ]
-              }
-            },
             {
               "id": "Hamburg-SO",
               "name": {
                 "value": "Hamburg Südost",
                 "synonyms": [
                   "Hamburg elbaufwärts",
-                  "Hamburg Blickrichtung Südost"
+                  "Hamburg Blick nach Südost",
+                  "Hamburg Blick nach Südosten",
+                  "Hamburg Blickrichtung Südost",
+                  "Hamburg Blickrichtung Südosten"
+                ]
+              }
+            },
+            {
+              "id": "Hamburg-SW",
+              "name": {
+                "value": "Hamburg Südwest",
+                "synonyms": [
+                  "Hamburg elbabwärts",
+                  "Hamburg Blick nach Südwest",
+                  "Hamburg Blick nach Südwesten",
+                  "Hamburg Blickrichtung Südwest",
+                  "Hamburg Blickrichtung Südwesten"
+                ]
+              }
+            },
+            {
+              "id": "Hohenpeissenberg-S",
+              "name": {
+                "value": "Hohenpeißenberg Süd",
+                "synonyms": [
+                  "Hohenpeißenberg Blick nach Süden",
+                  "Hohenpeißenberg Blickrichtung Süd",
+                  "Hohenpeißenberg Blickrichtung Süden"
+                ]
+              }
+            },
+            {
+              "id": "Hohenpeissenberg-SW",
+              "name": {
+                "value": "Hohenpeißenberg Südwesten",
+                "synonyms": [
+                  "Hohenpeißenberg Blick nach Südwest",
+                  "Hohenpeißenberg Blick nach Südwesten",
+                  "Hohenpeißenberg Blickrichtung Südwest",
+                  "Hohenpeißenberg Blickrichtung Südwesten"
+                ]
+              }
+            },
+            {
+              "id": "Offenbach-O",
+              "name": {
+                "value": "Offenbach Ost",
+                "synonyms": [
+                  "Offenbach Blick nach Osten",
+                  "Offenbach Blick nach Offenbach",
+                  "Offenbach Blickrichtung Ost",
+                  "Offenbach Blickrichtung Osten",
+                  "Offenbach Blickrichtung Offenbach"
+                ]
+              }
+            },
+            {
+              "id": "Offenbach-W",
+              "name": {
+                "value": "Offenbach West",
+                "synonyms": [
+                  "Offenbach Blick nach Westen",
+                  "Offenbach Blick nach Frankfurt",
+                  "Offenbach Blickrichtung West",
+                  "Offenbach Blickrichtung Westen",
+                  "Offenbach Blickrichtung Frankfurt"
+                ]
+              }
+            },
+            {
+              "id": "Schmuecke-SW",
+              "name": {
+                "value": "Schmücke Südwest",
+                "synonyms": [
+                  "Schmücke",
+                  "Schmücke Blick nach Südwest",
+                  "Schmücke Blick nach Südwesten",
+                  "Schmücke Blick nach Suhl",
+                  "Schmücke Blickrichtung Südwest",
+                  "Schmücke Blickrichtung Südwesten",
+                  "Schmücke Blickrichtung Suhl"
+                ]
+              }
+            },
+            {
+              "id": "Warnemuende-NW",
+              "name": {
+                "value": "Warnemünde Nordwest",
+                "synonyms": [
+                  "Warnemünde",
+                  "Rostock Warnemünde",
+                  "Warnemünde Blick nach Nordwest",
+                  "Warnemünde Blick nach Nordwesten",
+                  "Warnemünde Blickrichtung Nordwest",
+                  "Warnemünde Blickrichtung Nordwesten",
+                  "Rostock Warnemünde Blick nach Nordwest",
+                  "Rostock Warnemünde Blick nach Nordwesten",
+                  "Rostock Warnemünde Blickrichtung Nordwest",
+                  "Rostock Warnemünde Blickrichtung Nordwesten"
                 ]
               }
             }
-          ],
-          "name": "LIST_OF_WEBCAMS"
+          ]
         }
       ]
     },
@@ -117,7 +215,7 @@
               "elicitationRequired": true,
               "confirmationRequired": false,
               "prompts": {
-                "elicitation": "Elicit.Slot.149826922917.1009067625554"
+                "elicitation": "Elicit.Slot.WeatherCamIntent"
               }
             }
           ]
@@ -126,7 +224,7 @@
     },
     "prompts": [
       {
-        "id": "Elicit.Slot.149826922917.1009067625554",
+        "id": "Elicit.Slot.WeatherCamIntent",
         "variations": [
           {
             "type": "PlainText",
