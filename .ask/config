@@ -5,7 +5,7 @@
       "was_cloned": true,
       "resources": {
         "manifest": {
-          "eTag": "cb5b8d56c04d7c0586d970e4e60dada1"
+          "eTag": "3a0654f8efeeeadf2d90b9f665ed820a"
         },
         "interactionModel": {
           "de-DE": {
@@ -14,13 +14,13 @@
         },
         "lambda": [
           {
-            "arn": "arn:aws:lambda:eu-west-1:467353799488:function:weatherCams",
+            "arn": "arn:aws:lambda:eu-west-1:467353799488:function:weatherCams:1",
             "awsRegion": "eu-west-1",
             "functionName": "weatherCams",
             "alexaUsage": [
               "custom/default"
             ],
-            "revisionId": "f077d3e8-226d-46b7-bd3c-101ac6a730fc"
+            "revisionId": "a133c621-236b-4735-91d1-b38d14854b87"
           }
         ]
       },
@@ -29,7 +29,7 @@
           "apis": {
             "custom": {
               "endpoint": {
-                "uri": "arn:aws:lambda:eu-west-1:467353799488:function:weatherCams"
+                "uri": "arn:aws:lambda:eu-west-1:467353799488:function:weatherCams:1"
               }
             }
           }
