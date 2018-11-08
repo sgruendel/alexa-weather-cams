@@ -13,13 +13,14 @@ alexaTest.initialize(
     'amzn1.ask.account.VOID');
 alexaTest.setLocale('de-DE');
 
-describe('Wetter Kamera Skill', () => {
-    describe('LaunchRequest', () => {
+describe('Wetterkamera Skill', () => {
+
+    describe('ErrorHandler', () => {
         alexaTest.test([
             {
-                request: alexaTest.getLaunchRequest(),
-                says: 'Du kannst sagen „Frage Wetter Kamera nach Hamburg elbabwärts“, oder du kannst „Beenden“ sagen. Was soll ich tun?',
-                reprompts: 'Was soll ich tun?',
+                request: alexaTest.getIntentRequest(''),
+                says: 'Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?',
+                reprompts: 'Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?',
                 shouldEndSession: false,
             },
         ]);
@@ -29,9 +30,18 @@ describe('Wetter Kamera Skill', () => {
         alexaTest.test([
             {
                 request: alexaTest.getIntentRequest('AMAZON.HelpIntent'),
-                says: 'Du kannst sagen „Frage Wetter Kamera nach Hamburg elbabwärts“, oder du kannst „Beenden“ sagen. Was soll ich tun?',
-                reprompts: 'Was soll ich tun?',
+                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde zeigen. Welche Kamera soll ich anzeigen?',
+                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
                 shouldEndSession: false,
+            },
+        ]);
+    });
+
+    describe('SessionEndedRequest', () => {
+        alexaTest.test([
+            {
+                request: alexaTest.getSessionEndedRequest(),
+                saysNothing: true, repromptsNothing: true, shouldEndSession: true,
             },
         ]);
     });
@@ -56,21 +66,12 @@ describe('Wetter Kamera Skill', () => {
         ]);
     });
 
-    describe('SessionEndedRequest', () => {
+    describe('LaunchRequest', () => {
         alexaTest.test([
             {
-                request: alexaTest.getSessionEndedRequest(),
-                saysNothing: true, repromptsNothing: true, shouldEndSession: true,
-            },
-        ]);
-    });
-
-    describe('ErrorHandler', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getIntentRequest(''),
-                says: 'Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?',
-                reprompts: 'Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?',
+                request: alexaTest.getLaunchRequest(),
+                says: 'Welche Kamera soll ich anzeigen?',
+                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
                 shouldEndSession: false,
             },
         ]);
@@ -105,7 +106,17 @@ describe('Wetter Kamera Skill', () => {
                 request: alexaTest.addEntityResolutionNoMatchToRequest(
                     alexaTest.getIntentRequest('WeatherCamIntent'), 'webcam', LIST_OF_WEBCAMS, 'Würzburg'),
                 says: 'Ich kenne diese Kamera leider nicht.',
-                shouldEndSession: true,
+                repromptsNothing: true, shouldEndSession: true,
+            },
+        ]);
+    });
+
+    describe('UnsupportedCityIntent', () => {
+        alexaTest.test([
+            {
+                request: alexaTest.getIntentRequest('UnsupportedCityIntent', { city: 'berlin' }),
+                says: 'Ich kenne diese Kamera leider nicht.',
+                repromptsNothing: true, shouldEndSession: true,
             },
         ]);
     });

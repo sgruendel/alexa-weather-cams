@@ -1,6 +1,6 @@
 {
   "name": "alexa-weather-cams",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Alexa Skill to view DWD weather webcams",
   "main": "index.js",
   "scripts": {

@@ -24,9 +24,11 @@ const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
 const languageStrings = {
     de: {
         translation: {
-            HELP_MESSAGE: 'Du kannst sagen „Frage Wetter Kamera nach Hamburg elbabwärts“, oder du kannst „Beenden“ sagen. Was soll ich tun?',
-            HELP_REPROMPT: 'Was soll ich tun?',
+            HELP_MESSAGE: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde zeigen. Welche Kamera soll ich anzeigen?',
+            HELP_REPROMPT: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
             STOP_MESSAGE: '<say-as interpret-as="interjection">bis dann</say-as>.',
+            UNKNOWN_WEBCAM: 'Ich kenne diese Kamera leider nicht.',
+            NOT_UNDERSTOOD_MESSAGE: 'Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?',
         },
     },
 };
@@ -44,19 +46,30 @@ function supportsDisplay(handlerInput) {
 const WeatherCamIntentHandler = {
     canHandle(handlerInput) {
         const { request } = handlerInput.requestEnvelope;
-        return request.type === 'IntentRequest' && request.intent.name === 'WeatherCamIntent';
+        return request.type === 'LaunchRequest'
+            || (request.type === 'IntentRequest' && request.intent.name === 'WeatherCamIntent');
     },
     handle(handlerInput) {
         const { request } = handlerInput.requestEnvelope;
+        logger.debug('request', request);
+
         // delegate to Alexa to collect all the required slots
+        /*
         if (request.dialogState && request.dialogState !== 'COMPLETED') {
             logger.debug('dialog state is ' + request.dialogState + ' => adding delegate directive');
             return handlerInput.responseBuilder
                 .addDelegateDirective()
                 .getResponse();
-        }
+        }*/
 
-        const { slots } = request.intent;
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        const slots = request.intent && request.intent.slots;
+        if (!slots) {
+            return handlerInput.responseBuilder
+                .speak('Welche Kamera soll ich anzeigen?')
+                .reprompt(requestAttributes.t('HELP_REPROMPT'))
+                .getResponse();
+        }
         logger.debug('webcam slot', slots.webcam);
 
         const rpa = slots.webcam
@@ -64,9 +77,10 @@ const WeatherCamIntentHandler = {
             && slots.webcam.resolutions.resolutionsPerAuthority[0];
         switch (rpa.status.code) {
         case ER_SUCCESS_NO_MATCH:
+            // should never happen, as unmatched cities should go to UnsupportedCityIntentHandler
             logger.error('no match for webcam ' + slots.webcam.value);
             return handlerInput.responseBuilder
-                .speak('Ich kenne diese Kamera leider nicht.')
+                .speak(requestAttributes.t('UNKNOWN_WEBCAM'))
                 .getResponse();
 
         case ER_SUCCESS_MATCH:
@@ -122,19 +136,35 @@ const WeatherCamIntentHandler = {
     },
 };
 
+const UnsupportedCityIntentHandler = {
+    canHandle(handlerInput) {
+        const { request } = handlerInput.requestEnvelope;
+        return request.type === 'IntentRequest' && request.intent.name === 'UnsupportedCityIntent';
+    },
+    handle(handlerInput) {
+        const { request } = handlerInput.requestEnvelope;
+        logger.debug('request', request);
+
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        return handlerInput.responseBuilder
+            .speak(requestAttributes.t('UNKNOWN_WEBCAM'))
+            .getResponse();
+    },
+};
+
 const HelpIntentHandler = {
     canHandle(handlerInput) {
         const { request } = handlerInput.requestEnvelope;
-        return request.type === 'LaunchRequest'
-            || (request.type === 'IntentRequest' && request.intent.name === 'AMAZON.HelpIntent');
+        return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.HelpIntent';
     },
     handle(handlerInput) {
+        const { request } = handlerInput.requestEnvelope;
+        logger.debug('request', request);
+
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        const speechOutput = requestAttributes.t('HELP_MESSAGE');
-        const repromptSpeechOutput = requestAttributes.t('HELP_REPROMPT');
         return handlerInput.responseBuilder
-            .speak(speechOutput)
-            .reprompt(repromptSpeechOutput)
+            .speak(requestAttributes.t('HELP_MESSAGE'))
+            .reprompt(requestAttributes.t('HELP_REPROMPT'))
             .getResponse();
     },
 };
@@ -146,6 +176,9 @@ const CancelAndStopIntentHandler = {
             && (request.intent.name === 'AMAZON.CancelIntent' || request.intent.name === 'AMAZON.StopIntent');
     },
     handle(handlerInput) {
+        const { request } = handlerInput.requestEnvelope;
+        logger.debug('request', request);
+
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
         const speechOutput = requestAttributes.t('STOP_MESSAGE');
         return handlerInput.responseBuilder
@@ -159,7 +192,16 @@ const SessionEndedRequestHandler = {
         return handlerInput.requestEnvelope.request.type === 'SessionEndedRequest';
     },
     handle(handlerInput) {
-        logger.info('Session ended with reason: ' + handlerInput.requestEnvelope.request.reason);
+        const { request } = handlerInput.requestEnvelope;
+        try {
+            if (request.reason === 'ERROR') {
+                logger.error(request.error.type + ': ' + request.error.message);
+            }
+        } catch (err) {
+            logger.error(err, request);
+        }
+
+        logger.debug('session ended', request);
         return handlerInput.responseBuilder.getResponse();
     },
 };
@@ -169,10 +211,13 @@ const ErrorHandler = {
         return true;
     },
     handle(handlerInput, error) {
-        logger.error('unhandled error', { message: error.message, stack: error.stack });
+        logger.error(error.message,
+            { request: handlerInput.requestEnvelope.request, stack: error.stack, error: error });
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        const speechOutput = requestAttributes.t('NOT_UNDERSTOOD_MESSAGE');
         return handlerInput.responseBuilder
-            .speak('Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?')
-            .reprompt('Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?')
+            .speak(speechOutput)
+            .reprompt(speechOutput)
             .getResponse();
     },
 };
@@ -196,6 +241,7 @@ const LocalizationInterceptor = {
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         WeatherCamIntentHandler,
+        UnsupportedCityIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler)

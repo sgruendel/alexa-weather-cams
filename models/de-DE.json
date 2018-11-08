@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "wetter kamera",
+      "invocationName": "wetterkamera",
       "intents": [
         {
           "name": "AMAZON.CancelIntent",
@@ -26,7 +26,10 @@
               "name": "webcam",
               "type": "LIST_OF_WEBCAMS",
               "samples": [
-                "{webcam}"
+                "{webcam}",
+                "für {webcam}",
+                "in {webcam}",
+                "von {webcam}"
               ]
             }
           ],
@@ -44,6 +47,22 @@
             "nach der Kamera für {webcam}",
             "nach der Kamera in {webcam}",
             "nach der Kamera von {webcam}"
+          ]
+        },
+        {
+          "name": "UnsupportedCityIntent",
+          "slots": [
+            {
+              "name": "city",
+              "type": "AMAZON.DE_CITY"
+            }
+          ],
+          "samples": [
+            "{city}",
+            "für {city}",
+            "in {city}",
+            "mit {city}",
+            "von {city}"
           ]
         },
         {
@@ -96,6 +115,8 @@
               "name": {
                 "value": "Hamburg Südost",
                 "synonyms": [
+                  "Hamburg",
+                  "Hamburg Südosten",
                   "Hamburg elbaufwärts",
                   "Hamburg Blick nach Südost",
                   "Hamburg Blick nach Südosten",
@@ -109,6 +130,7 @@
               "name": {
                 "value": "Hamburg Südwest",
                 "synonyms": [
+                  "Hamburg Südwesten",
                   "Hamburg elbabwärts",
                   "Hamburg Blick nach Südwest",
                   "Hamburg Blick nach Südwesten",
@@ -122,6 +144,7 @@
               "name": {
                 "value": "Hohenpeißenberg Süd",
                 "synonyms": [
+                  "Hohenpeißenberg Süden",
                   "Hohenpeißenberg Blick nach Süden",
                   "Hohenpeißenberg Blickrichtung Süd",
                   "Hohenpeißenberg Blickrichtung Süden"
@@ -131,8 +154,9 @@
             {
               "id": "Hohenpeissenberg-SW",
               "name": {
-                "value": "Hohenpeißenberg Südwesten",
+                "value": "Hohenpeißenberg Südwest",
                 "synonyms": [
+                  "Hohenpeißenberg Südwesten",
                   "Hohenpeißenberg Blick nach Südwest",
                   "Hohenpeißenberg Blick nach Südwesten",
                   "Hohenpeißenberg Blickrichtung Südwest",
@@ -145,6 +169,7 @@
               "name": {
                 "value": "Offenbach Ost",
                 "synonyms": [
+                  "Offenbach Osten",
                   "Offenbach Blick nach Osten",
                   "Offenbach Blick nach Offenbach",
                   "Offenbach Blickrichtung Ost",
@@ -158,6 +183,7 @@
               "name": {
                 "value": "Offenbach West",
                 "synonyms": [
+                  "Offenbach Westen",
                   "Offenbach Blick nach Westen",
                   "Offenbach Blick nach Frankfurt",
                   "Offenbach Blickrichtung West",
@@ -172,6 +198,7 @@
                 "value": "Schmücke Südwest",
                 "synonyms": [
                   "Schmücke",
+                  "Schmücke Südwesten",
                   "Schmücke Blick nach Südwest",
                   "Schmücke Blick nach Südwesten",
                   "Schmücke Blick nach Suhl",
@@ -187,7 +214,10 @@
                 "value": "Warnemünde Nordwest",
                 "synonyms": [
                   "Warnemünde",
+                  "Warnemünde Nordwesten",
                   "Rostock Warnemünde",
+                  "Rostock Warnemünde Nordwest",
+                  "Rostock Warnemünde Nordwesten",
                   "Warnemünde Blick nach Nordwest",
                   "Warnemünde Blick nach Nordwesten",
                   "Warnemünde Blickrichtung Nordwest",
