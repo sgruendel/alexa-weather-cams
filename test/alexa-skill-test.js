@@ -37,15 +37,6 @@ describe('Wetterkamera Skill', () => {
         ]);
     });
 
-    describe('SessionEndedRequest', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getSessionEndedRequest(),
-                saysNothing: true, repromptsNothing: true, shouldEndSession: true,
-            },
-        ]);
-    });
-
     describe('CancelIntent', () => {
         alexaTest.test([
             {
@@ -62,6 +53,15 @@ describe('Wetterkamera Skill', () => {
                 request: alexaTest.getIntentRequest('AMAZON.StopIntent'),
                 says: '<say-as interpret-as="interjection">bis dann</say-as>.',
                 repromptsNothing: true, shouldEndSession: true,
+            },
+        ]);
+    });
+
+    describe('SessionEndedRequest', () => {
+        alexaTest.test([
+            {
+                request: alexaTest.getSessionEndedRequest(),
+                saysNothing: true, repromptsNothing: true, shouldEndSession: true,
             },
         ]);
     });
