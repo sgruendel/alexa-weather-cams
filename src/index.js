@@ -64,7 +64,11 @@ const WeatherCamIntentHandler = {
 
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
         const slots = request.intent && request.intent.slots;
-        if (!slots) {
+        const rpa = slots
+            && slots.webcam
+            && slots.webcam.resolutions
+            && slots.webcam.resolutions.resolutionsPerAuthority[0];
+        if (!rpa) {
             return handlerInput.responseBuilder
                 .speak('Welche Kamera soll ich anzeigen?')
                 .reprompt(requestAttributes.t('HELP_REPROMPT'))
@@ -72,9 +76,6 @@ const WeatherCamIntentHandler = {
         }
         logger.debug('webcam slot', slots.webcam);
 
-        const rpa = slots.webcam
-            && slots.webcam.resolutions
-            && slots.webcam.resolutions.resolutionsPerAuthority[0];
         switch (rpa.status.code) {
         case ER_SUCCESS_NO_MATCH:
             // should never happen, as unmatched cities should go to UnsupportedCityIntentHandler
