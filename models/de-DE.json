@@ -50,22 +50,6 @@
           ]
         },
         {
-          "name": "UnsupportedCityIntent",
-          "slots": [
-            {
-              "name": "city",
-              "type": "AMAZON.DE_CITY"
-            }
-          ],
-          "samples": [
-            "{city}",
-            "für {city}",
-            "in {city}",
-            "mit {city}",
-            "von {city}"
-          ]
-        },
-        {
           "name": "AMAZON.MoreIntent",
           "samples": []
         },
@@ -115,7 +99,6 @@
               "name": {
                 "value": "Hamburg Südost",
                 "synonyms": [
-                  "Hamburg",
                   "Hamburg Südosten",
                   "Hamburg elbaufwärts",
                   "Hamburg Elbe aufwärts",
@@ -240,15 +223,22 @@
         {
           "name": "WeatherCamIntent",
           "confirmationRequired": false,
+          "prompts": {},
           "slots": [
             {
               "name": "webcam",
               "type": "LIST_OF_WEBCAMS",
-              "elicitationRequired": true,
               "confirmationRequired": false,
+              "elicitationRequired": true,
               "prompts": {
                 "elicitation": "Elicit.Slot.WeatherCamIntent"
-              }
+              },
+              "validations": [
+                {
+                  "type": "hasEntityResolutionMatch",
+                  "prompt": "Slot.Validation.WeatherCamIntent"
+                }
+              ]
             }
           ]
         }
@@ -261,6 +251,15 @@
           {
             "type": "PlainText",
             "value": "Welche Kamera?"
+          }
+        ]
+      },
+      {
+        "id": "Slot.Validation.WeatherCamIntent",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Es gibt leider keine Kamera für {webcam}. Welche Kamera soll ich anzeigen?"
           }
         ]
       }

@@ -16,13 +16,13 @@
             "wetterkamera"
           ],
           "name": "Wetterkamera",
-          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/893f/31dea8aa14cc4f7ba9be784a8a72003c/APP_ICON?versionId=lh7WXm3I80FvrfinqBQtkuT0rwrch6lU&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1541701481&Signature=t9X%2FH8PWlVm1nWtygDs%2BXoMgSI0%3D",
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/893f/31dea8aa14cc4f7ba9be784a8a72003c/APP_ICON?versionId=lh7WXm3I80FvrfinqBQtkuT0rwrch6lU&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1542274391&Signature=TDLESvMZGUN7%2FqicoK3GyDgL8rQ%3D",
           "description": "Dieser Skill funktioniert nur sinnvoll mit dem Echo Show oder Echo Spot.\n\nEs werden die aktuellen Aufnahmen der öffentlichen Wetterkameras vom DWD (Deutscher Wetterdienst) angezeigt, Aufruf über\n\"Alexa, öffne Wetterkamera für Hamburg elbabwärts\"\noder\n\"Alexa, öffne Wetterkamera in Schmücke\"\n\nDWD-Wetterkameras stehen in Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde.\n\nQuelle: Deutscher Wetterdienst\n\nVerbesserungsvorschläge und Feedback gerne unter https://github.com/sgruendel/alexa-weather-cams/issues/new.",
-          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/2c34/e7f4c5d51a5e463dba6c6163678bea4c/APP_ICON_LARGE?versionId=EqD0FGbr3yG09f1kuUOHKUVb_oJiEhiy&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1541701481&Signature=YrneOHr%2FC99fV%2BjwuJetIBVjLyI%3D"
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/2c34/e7f4c5d51a5e463dba6c6163678bea4c/APP_ICON_LARGE?versionId=EqD0FGbr3yG09f1kuUOHKUVb_oJiEhiy&AWSAccessKeyId=AKIAJFEYRBGIHK2BBYKA&Expires=1542274391&Signature=lVeoo6WrCuvvxty%2F1Fpd4SPFY20%3D"
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Aktuelle Bilder siehe https://www.dwd.de/DE/wetter/wetterundklima_vorort/wetterkameras/wetter_cams.html",
+      "testingInstructions": "Aktuelle Bilder siehe https://www.dwd.de/DE/wetter/wetterundklima_vorort/wetterkameras/wetter_cams.html\n\nÄnderungen gegenüber vorheriger Version (Lambda Version 2):\n* Verwendung der Slot Validations für Kameras",
       "category": "WEATHER",
       "distributionCountries": []
     },

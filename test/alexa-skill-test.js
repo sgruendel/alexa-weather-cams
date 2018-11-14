@@ -110,14 +110,4 @@ describe('Wetterkamera Skill', () => {
             },
         ]);
     });
-
-    describe('UnsupportedCityIntent', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getIntentRequest('UnsupportedCityIntent', { city: 'berlin' }),
-                says: 'Ich kenne diese Kamera leider nicht.',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-        ]);
-    });
 });

@@ -54,13 +54,12 @@ const WeatherCamIntentHandler = {
         logger.debug('request', request);
 
         // delegate to Alexa to collect all the required slots
-        /*
         if (request.dialogState && request.dialogState !== 'COMPLETED') {
             logger.debug('dialog state is ' + request.dialogState + ' => adding delegate directive');
             return handlerInput.responseBuilder
                 .addDelegateDirective()
                 .getResponse();
-        }*/
+        }
 
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
         const slots = request.intent && request.intent.slots;
@@ -78,7 +77,7 @@ const WeatherCamIntentHandler = {
 
         switch (rpa.status.code) {
         case ER_SUCCESS_NO_MATCH:
-            // should never happen, as unmatched cities should go to UnsupportedCityIntentHandler
+            // should never happen, as we only accept Slot type’s values and synonyms
             logger.error('no match for webcam ' + slots.webcam.value);
             return handlerInput.responseBuilder
                 .speak(requestAttributes.t('UNKNOWN_WEBCAM'))
@@ -137,22 +136,6 @@ const WeatherCamIntentHandler = {
     },
 };
 
-const UnsupportedCityIntentHandler = {
-    canHandle(handlerInput) {
-        const { request } = handlerInput.requestEnvelope;
-        return request.type === 'IntentRequest' && request.intent.name === 'UnsupportedCityIntent';
-    },
-    handle(handlerInput) {
-        const { request } = handlerInput.requestEnvelope;
-        logger.debug('request', request);
-
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        return handlerInput.responseBuilder
-            .speak(requestAttributes.t('UNKNOWN_WEBCAM'))
-            .getResponse();
-    },
-};
-
 const HelpIntentHandler = {
     canHandle(handlerInput) {
         const { request } = handlerInput.requestEnvelope;
@@ -199,7 +182,7 @@ const SessionEndedRequestHandler = {
                 logger.error(request.error.type + ': ' + request.error.message);
             }
         } catch (err) {
-            logger.error(err, request);
+            logger.error(err.stack || err.toString(), request);
         }
 
         logger.debug('session ended', request);
@@ -212,8 +195,7 @@ const ErrorHandler = {
         return true;
     },
     handle(handlerInput, error) {
-        logger.error(error.message,
-            { request: handlerInput.requestEnvelope.request, stack: error.stack, error: error });
+        logger.error(error.stack || error.toString(), handlerInput.requestEnvelope.request);
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
         const speechOutput = requestAttributes.t('NOT_UNDERSTOOD_MESSAGE');
         return handlerInput.responseBuilder
@@ -242,7 +224,6 @@ const LocalizationInterceptor = {
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         WeatherCamIntentHandler,
-        UnsupportedCityIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler)
