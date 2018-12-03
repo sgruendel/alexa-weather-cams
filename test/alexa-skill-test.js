@@ -37,6 +37,34 @@ describe('Wetterkamera Skill', () => {
         ]);
     });
 
+    describe('PreviousIntent', () => {
+        alexaTest.test([
+            {
+                request: alexaTest.getIntentRequest('AMAZON.PreviousIntent'),
+                says: 'Hier ist die Kamera Hamburg Südost.',
+                hasCardTitle: 'Hamburg Südost',
+                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
+                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_114.jpg',
+                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_180.jpg',
+                repromptsNothing: true, shouldEndSession: true,
+            },
+        ]);
+    });
+
+    describe('NextIntent', () => {
+        alexaTest.test([
+            {
+                request: alexaTest.getIntentRequest('AMAZON.NextIntent'),
+                says: 'Hier ist die Kamera Warnemünde Nordwest.',
+                hasCardTitle: 'Warnemünde Nordwest',
+                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
+                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_114.jpg',
+                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_180.jpg',
+                repromptsNothing: true, shouldEndSession: true,
+            },
+        ]);
+    });
+
     describe('CancelIntent', () => {
         alexaTest.test([
             {
@@ -61,6 +89,10 @@ describe('Wetterkamera Skill', () => {
         alexaTest.test([
             {
                 request: alexaTest.getSessionEndedRequest(),
+                saysNothing: true, repromptsNothing: true, shouldEndSession: true,
+            },
+            {
+                request: alexaTest.getSessionEndedRequest('ERROR'),
                 saysNothing: true, repromptsNothing: true, shouldEndSession: true,
             },
         ]);

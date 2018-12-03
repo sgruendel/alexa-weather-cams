@@ -43,6 +43,32 @@ function supportsDisplay(handlerInput) {
         && context.System.device.supportedInterfaces.Display;
 }
 
+function getResponseFor(handlerInput, value) {
+    const baseUrl = 'https://opendata.dwd.de/weather/webcam/' + value.id + '/' + value.id + '_latest_';
+    if (supportsDisplay(handlerInput)) {
+        const webcamImage = new Alexa.ImageHelper()
+            .withDescription(COPYRIGHT)
+            .addImageInstance(baseUrl + '400.jpg', 'X_SMALL', 400, 225)
+            .addImageInstance(baseUrl + '640.jpg', 'SMALL', 640, 360)
+            .addImageInstance(baseUrl + '816.jpg', 'MEDIUM', 816, 459)
+            // .addImageInstance(baseUrl + '1200.jpg', 'LARGE', 1200, 675)
+            // .addImageInstance(baseUrl + '1920.jpg', 'X_LARGE', 1920, 1080)
+            .getImage();
+        handlerInput.responseBuilder
+            .addRenderTemplateDirective({
+                type: 'BodyTemplate7',
+                backButton: 'HIDDEN',
+                image: webcamImage,
+                title: value.name,
+            });
+    }
+
+    return handlerInput.responseBuilder
+        .speak('Hier ist die Kamera ' + value.name + '.')
+        .withStandardCard(value.name, COPYRIGHT, baseUrl + '114.jpg', baseUrl + '180.jpg')
+        .getResponse();
+}
+
 const WeatherCamIntentHandler = {
     canHandle(handlerInput) {
         const { request } = handlerInput.requestEnvelope;
@@ -110,29 +136,7 @@ const WeatherCamIntentHandler = {
         const value = rpa.values[0].value;
         logger.info('webcam value', value);
 
-        const baseUrl = 'https://opendata.dwd.de/weather/webcam/' + value.id + '/' + value.id + '_latest_';
-        if (supportsDisplay(handlerInput)) {
-            const webcamImage = new Alexa.ImageHelper()
-                .withDescription(COPYRIGHT)
-                .addImageInstance(baseUrl + '400.jpg', 'X_SMALL', 400, 225)
-                .addImageInstance(baseUrl + '640.jpg', 'SMALL', 640, 360)
-                .addImageInstance(baseUrl + '816.jpg', 'MEDIUM', 816, 459)
-                // .addImageInstance(baseUrl + '1200.jpg', 'LARGE', 1200, 675)
-                // .addImageInstance(baseUrl + '1920.jpg', 'X_LARGE', 1920, 1080)
-                .getImage();
-            handlerInput.responseBuilder
-                .addRenderTemplateDirective({
-                    type: 'BodyTemplate7',
-                    backButton: 'HIDDEN',
-                    image: webcamImage,
-                    title: value.name,
-                });
-        }
-
-        return handlerInput.responseBuilder
-            .speak('Hier ist die Kamera ' + value.name + '.')
-            .withStandardCard(value.name, COPYRIGHT, baseUrl + '114.jpg', baseUrl + '180.jpg')
-            .getResponse();
+        return getResponseFor(handlerInput, value);
     },
 };
 
@@ -150,6 +154,34 @@ const HelpIntentHandler = {
             .speak(requestAttributes.t('HELP_MESSAGE'))
             .reprompt(requestAttributes.t('HELP_REPROMPT'))
             .getResponse();
+    },
+};
+
+const PreviousIntentHandler = {
+    canHandle(handlerInput) {
+        const { request } = handlerInput.requestEnvelope;
+        return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.PreviousIntent';
+    },
+    handle(handlerInput) {
+        const { request } = handlerInput.requestEnvelope;
+        logger.debug('request', request);
+
+        // TODO: Store cam from WeatherCamIntentHandler in session and then use proper previous cam here
+        return getResponseFor(handlerInput, { id: 'Hamburg-SO', name: 'Hamburg Südost' });
+    },
+};
+
+const NextIntentHandler = {
+    canHandle(handlerInput) {
+        const { request } = handlerInput.requestEnvelope;
+        return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.NextIntent';
+    },
+    handle(handlerInput) {
+        const { request } = handlerInput.requestEnvelope;
+        logger.debug('request', request);
+
+        // TODO: Store cam from WeatherCamIntentHandler in session and then use proper next cam here
+        return getResponseFor(handlerInput, { id: 'Warnemuende-NW', name: 'Warnemünde Nordwest' });
     },
 };
 
@@ -225,6 +257,8 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         WeatherCamIntentHandler,
         HelpIntentHandler,
+        PreviousIntentHandler,
+        NextIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler)
     .addRequestInterceptors(LocalizationInterceptor)

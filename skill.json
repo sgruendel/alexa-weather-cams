@@ -22,7 +22,7 @@
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Aktuelle Bilder siehe https://www.dwd.de/DE/wetter/wetterundklima_vorort/wetterkameras/wetter_cams.html\n\nÄnderungen gegenüber vorheriger Version (Lambda Version 2):\n* Verwendung der Slot Validations für Kameras",
+      "testingInstructions": "Aktuelle Bilder siehe https://www.dwd.de/DE/wetter/wetterundklima_vorort/wetterkameras/wetter_cams.html\n\nÄnderungen gegenüber vorheriger Version (Lambda Version 3):\n* Unterstützung von PreviousIntent und NextIntent",
       "category": "WEATHER",
       "distributionCountries": []
     },
