@@ -111,16 +111,36 @@ const WeatherCamIntentHandler = {
 
         case ER_SUCCESS_MATCH:
             if (rpa.values.length > 1) {
+                const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+                if (sessionAttributes.names) {
+                    logger.debug('previous names', sessionAttributes.names);
+                    const foundValue = rpa.values.find(value => {
+                        return sessionAttributes.names.find(name => {
+                            return name === value.value.name;
+                        });
+                    });
+                    if (foundValue) {
+                        logger.info('found matching previous value', foundValue);
+                        return getResponseFor(handlerInput, foundValue.value);
+                    }
+                }
+
                 logger.info('multiple matches for ' + slots.webcam.value);
                 var prompt = 'Welche Kamera';
                 const size = rpa.values.length;
 
+                var names = [];
                 rpa.values.forEach((element, index) => {
                     prompt += ((index === size - 1) ? ' oder ' : ', ') + element.value.name;
+                    names.push(element.value.name);
                 });
 
                 prompt += '?';
                 logger.info('eliciting webcam slot: ' + prompt);
+
+                sessionAttributes.names = names;
+                handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
                 return handlerInput.responseBuilder
                     .speak(prompt)
                     .reprompt(prompt)

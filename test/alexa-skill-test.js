@@ -123,6 +123,17 @@ describe('Wetterkamera Skill', () => {
                 repromptsNothing: true, shouldEndSession: true,
             },
             {
+                request: alexaTest.addEntityResolutionNoMatchToRequest(
+                    alexaTest.getIntentRequest('WeatherCamIntent'), 'webcam', LIST_OF_WEBCAMS, 'Würzburg'),
+                says: 'Ich kenne diese Kamera leider nicht.',
+                repromptsNothing: true, shouldEndSession: true,
+            },
+        ]);
+    });
+
+    describe('WeatherCamIntent (multiple matches)', () => {
+        alexaTest.test([
+            {
                 request: alexaTest.addEntityResolutionsToRequest(
                     alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Offenbach' }),
                     [
@@ -132,12 +143,44 @@ describe('Wetterkamera Skill', () => {
                 elicitsSlot: 'webcam',
                 says: 'Welche Kamera, Offenbach Ost oder Offenbach West?',
                 reprompts: 'Welche Kamera, Offenbach Ost oder Offenbach West?',
+                hasAttributes: {
+                    names: names => { return names[0] === 'Offenbach Ost' && names[1] === 'Offenbach West' && names.length === 2; },
+                },
+                shouldEndSession: false,
+            },
+        ]);
+    });
+
+    describe('WeatherCamIntent (matching previous value)', () => {
+        alexaTest.test([
+            {
+                request: alexaTest.addEntityResolutionsToRequest(
+                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Hamburg' }),
+                    [
+                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Hamburg Südost', id: 'Hamburg-SO' },
+                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Hamburg Südwest', id: 'Hamburg-SW' },
+                    ]),
+                elicitsSlot: 'webcam',
+                says: 'Welche Kamera, Hamburg Südost oder Hamburg Südwest?',
+                reprompts: 'Welche Kamera, Hamburg Südost oder Hamburg Südwest?',
+                hasAttributes: {
+                    names: names => { return names[0] === 'Hamburg Südost' && names[1] === 'Hamburg Südwest' && names.length === 2; },
+                },
                 shouldEndSession: false,
             },
             {
-                request: alexaTest.addEntityResolutionNoMatchToRequest(
-                    alexaTest.getIntentRequest('WeatherCamIntent'), 'webcam', LIST_OF_WEBCAMS, 'Würzburg'),
-                says: 'Ich kenne diese Kamera leider nicht.',
+                request: alexaTest.addEntityResolutionsToRequest(
+                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Südwest' }),
+                    [
+                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Hamburg Südwest', id: 'Hamburg-SW' },
+                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Schmücke Südwest', id: 'Schmuecke-SW' },
+                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Hohenpeißenberg Südwest', id: 'Hohenpeissenberg-SW' },
+                    ]),
+                says: 'Hier ist die Kamera Hamburg Südwest.',
+                hasCardTitle: 'Hamburg Südwest',
+                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
+                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_114.jpg',
+                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_180.jpg',
                 repromptsNothing: true, shouldEndSession: true,
             },
         ]);
