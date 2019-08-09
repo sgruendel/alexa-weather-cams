@@ -33,19 +33,9 @@ const languageStrings = {
     },
 };
 
-// returns true if the skill is running on a device with a display (show|spot)
-function supportsDisplay(handlerInput) {
-    const { context } = handlerInput.requestEnvelope;
-    return context
-        && context.System
-        && context.System.device
-        && context.System.device.supportedInterfaces
-        && context.System.device.supportedInterfaces.Display;
-}
-
 function getResponseFor(handlerInput, value) {
     const baseUrl = 'https://opendata.dwd.de/weather/webcam/' + value.id + '/' + value.id + '_latest_';
-    if (supportsDisplay(handlerInput)) {
+    if (Alexa.getSupportedInterfaces(handlerInput.requestEnvelope).Display) {
         const webcamImage = new Alexa.ImageHelper()
             .withDescription(COPYRIGHT)
             .addImageInstance(baseUrl + '400.jpg', 'X_SMALL', 400, 225)
@@ -262,7 +252,7 @@ const ErrorHandler = {
 const LocalizationInterceptor = {
     process(handlerInput) {
         i18next.use(sprintf).init({
-            lng: handlerInput.requestEnvelope.request.locale,
+            lng: Alexa.getLocale(handlerInput.requestEnvelope),
             overloadTranslationOptionHandler: sprintf.overloadTranslationOptionHandler,
             resources: languageStrings,
             returnObjects: true,
