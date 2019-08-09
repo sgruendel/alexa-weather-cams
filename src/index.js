@@ -121,6 +121,8 @@ const WeatherCamIntentHandler = {
                     });
                     if (foundValue) {
                         logger.info('found matching previous value', foundValue);
+                        sessionAttributes.names = undefined;
+                        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
                         return getResponseFor(handlerInput, foundValue.value);
                     }
                 }
