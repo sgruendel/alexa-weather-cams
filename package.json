@@ -1,13 +1,13 @@
 {
   "name": "alexa-weather-cams",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Alexa Skill to view DWD weather webcams",
   "main": "index.js",
   "scripts": {
     "invoke": "aws lambda invoke --function-name weatherCams --payload fileb://test/events/alexa-start-session.json test/out.txt && cat test/out.txt",
     "test": "nyc --reporter=lcov --reporter=text mocha",
     "deploy-lambda": "npm prune --production && npm run lambda-zip && npm run lambda-update && npm install",
-    "lambda-zip": "zip -x 'node_modules/.cache/*' -r index.zip node_modules && cd src && zip ../index.zip *",
+    "lambda-zip": "zip -x 'node_modules/.cache/*' -r index.zip node_modules models && cd src && zip ../index.zip *",
     "lambda-update": "aws lambda update-function-code --function-name weatherCams --zip-file fileb://index.zip",
     "deploy-skill": "ask deploy --target skill",
     "deploy-model": "ask deploy --target model"
@@ -34,7 +34,7 @@
     "ask-sdk-core": "^2.7.0",
     "ask-sdk-model": "^1.18.0",
     "dashbot": "^10.4.2",
-    "i18next": "^17.0.9",
+    "i18next": "^17.0.10",
     "i18next-sprintf-postprocessor": "^0.2.2",
     "winston": "^3.2.1"
   },

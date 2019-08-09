@@ -3,37 +3,30 @@
     "default": {
       "skill_id": "amzn1.ask.skill.6896cced-41a6-4134-912d-c74db2be8559",
       "was_cloned": false,
+      "merge": {},
       "resources": {
         "manifest": {
-          "eTag": "900512fd4cc2012a21612a576ab05302"
+          "eTag": "0a886924c4ec5567aa8e2c27575e815c"
         },
         "interactionModel": {
           "de-DE": {
-            "eTag": "a05eb91a5a938b845bbecf6f375dd643"
+            "eTag": "18ee2c1de88f997d0eb6a1a25cf7f4fd"
           }
         },
         "lambda": [
           {
-            "arn": "arn:aws:lambda:eu-west-1:467353799488:function:weatherCams:4",
+            "arn": "arn:aws:lambda:eu-west-1:467353799488:function:weatherCams:6",
             "awsRegion": "eu-west-1",
             "functionName": "weatherCams",
             "alexaUsage": [
               "custom/default"
             ],
-            "revisionId": "b3a13125-7ecb-43f9-8bcd-805cb199ec53"
+            "revisionId": "594c10d1-8eda-48d1-ad92-1b33db944b0a",
+            "codeUri": "src",
+            "handler": "index.handler",
+            "runtime": "nodejs8.10"
           }
         ]
-      },
-      "merge": {
-        "manifest": {
-          "apis": {
-            "custom": {
-              "endpoint": {
-                "uri": "arn:aws:lambda:eu-west-1:467353799488:function:weatherCams:4"
-              }
-            }
-          }
-        }
       }
     }
   }
