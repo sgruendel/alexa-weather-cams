@@ -41,11 +41,58 @@ describe('Wetterkamera Skill', () => {
         alexaTest.test([
             {
                 request: alexaTest.getIntentRequest('AMAZON.PreviousIntent'),
+                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde zeigen. Welche Kamera soll ich anzeigen?',
+                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
+                shouldEndSession: false,
+            },
+        ]);
+    });
+
+    describe('PreviousIntent for Hamburg Südost', () => {
+        alexaTest.test([
+            {
+                request: alexaTest.addEntityResolutionToRequest(
+                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Hamburg Südost' }),
+                    'webcam', LIST_OF_WEBCAMS, 'Hamburg Südost', 'Hamburg-SO'),
                 says: 'Hier ist die Kamera Hamburg Südost.',
                 hasCardTitle: 'Hamburg Südost',
                 hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
                 hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_114.jpg',
                 hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_180.jpg',
+                repromptsNothing: true, shouldEndSession: true,
+            },
+            {
+                request: alexaTest.getIntentRequest('AMAZON.PreviousIntent'),
+                says: 'Hier ist die Kamera Warnemünde Nordwest.',
+                hasCardTitle: 'Warnemünde Nordwest',
+                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
+                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_114.jpg',
+                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_180.jpg',
+                repromptsNothing: true, shouldEndSession: true,
+            },
+        ]);
+    });
+
+    describe('PreviousIntent for Warnemünde Nordwest', () => {
+        alexaTest.test([
+            {
+                request: alexaTest.addEntityResolutionToRequest(
+                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Warnemünde Nordwest' }),
+                    'webcam', LIST_OF_WEBCAMS, 'Warnemünde Nordwest', 'Warnemuende-NW'),
+                says: 'Hier ist die Kamera Warnemünde Nordwest.',
+                hasCardTitle: 'Warnemünde Nordwest',
+                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
+                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_114.jpg',
+                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_180.jpg',
+                repromptsNothing: true, shouldEndSession: true,
+            },
+            {
+                request: alexaTest.getIntentRequest('AMAZON.PreviousIntent'),
+                says: 'Hier ist die Kamera Schmücke Südwest.',
+                hasCardTitle: 'Schmücke Südwest',
+                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
+                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Schmuecke-SW/Schmuecke-SW_latest_114.jpg',
+                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Schmuecke-SW/Schmuecke-SW_latest_180.jpg',
                 repromptsNothing: true, shouldEndSession: true,
             },
         ]);
@@ -55,11 +102,58 @@ describe('Wetterkamera Skill', () => {
         alexaTest.test([
             {
                 request: alexaTest.getIntentRequest('AMAZON.NextIntent'),
+                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde zeigen. Welche Kamera soll ich anzeigen?',
+                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
+                shouldEndSession: false,
+            },
+        ]);
+    });
+
+    describe('NextIntent for Hamburg Südost', () => {
+        alexaTest.test([
+            {
+                request: alexaTest.addEntityResolutionToRequest(
+                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Hamburg Südost' }),
+                    'webcam', LIST_OF_WEBCAMS, 'Hamburg Südost', 'Hamburg-SO'),
+                says: 'Hier ist die Kamera Hamburg Südost.',
+                hasCardTitle: 'Hamburg Südost',
+                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
+                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_114.jpg',
+                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_180.jpg',
+                repromptsNothing: true, shouldEndSession: true,
+            },
+            {
+                request: alexaTest.getIntentRequest('AMAZON.NextIntent'),
+                says: 'Hier ist die Kamera Hamburg Südwest.',
+                hasCardTitle: 'Hamburg Südwest',
+                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
+                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_114.jpg',
+                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_180.jpg',
+                repromptsNothing: true, shouldEndSession: true,
+            },
+        ]);
+    });
+
+    describe('NextIntent for Warnemünde Nordwest', () => {
+        alexaTest.test([
+            {
+                request: alexaTest.addEntityResolutionToRequest(
+                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Warnemünde Nordwest' }),
+                    'webcam', LIST_OF_WEBCAMS, 'Warnemünde Nordwest', 'Warnemuende-NW'),
                 says: 'Hier ist die Kamera Warnemünde Nordwest.',
                 hasCardTitle: 'Warnemünde Nordwest',
                 hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
                 hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_114.jpg',
                 hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_180.jpg',
+                repromptsNothing: true, shouldEndSession: true,
+            },
+            {
+                request: alexaTest.getIntentRequest('AMAZON.NextIntent'),
+                says: 'Hier ist die Kamera Hamburg Südost.',
+                hasCardTitle: 'Hamburg Südost',
+                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
+                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_114.jpg',
+                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_180.jpg',
                 repromptsNothing: true, shouldEndSession: true,
             },
         ]);

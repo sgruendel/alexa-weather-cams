@@ -16,6 +16,14 @@ const logger = winston.createLogger({
     exitOnError: false,
 });
 
+var model;
+try {
+    model = require('models/de-DE');
+} catch (err) {
+    // for mocha tests
+    model = require('../models/de-DE');
+}
+
 const SKILL_ID = 'amzn1.ask.skill.6896cced-41a6-4134-912d-c74db2be8559';
 const ER_SUCCESS_MATCH = 'ER_SUCCESS_MATCH';
 const ER_SUCCESS_NO_MATCH = 'ER_SUCCESS_NO_MATCH';
@@ -52,6 +60,10 @@ function getResponseFor(handlerInput, value) {
                 title: value.name,
             });
     }
+
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    sessionAttributes.value = value;
+    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
     return handlerInput.responseBuilder
         .speak('Hier ist die Kamera ' + value.name + '.')
@@ -110,7 +122,7 @@ const WeatherCamIntentHandler = {
                         });
                     });
                     if (foundValue) {
-                        logger.info('found matching previous value', foundValue);
+                        logger.info('found matching previous answer option', foundValue);
                         sessionAttributes.names = undefined;
                         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
                         return getResponseFor(handlerInput, foundValue.value);
@@ -178,8 +190,35 @@ const PreviousIntentHandler = {
         const { request } = handlerInput.requestEnvelope;
         logger.debug('request', request);
 
-        // TODO: Store cam from WeatherCamIntentHandler in session and then use proper previous cam here
-        return getResponseFor(handlerInput, { id: 'Hamburg-SO', name: 'Hamburg Südost' });
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        if (sessionAttributes.value) {
+            logger.debug('last webcam', sessionAttributes.value);
+            const foundIndex = model.interactionModel.languageModel.types[0].values.findIndex(value => {
+                return value.id === sessionAttributes.value.id;
+            });
+            if (foundIndex > 0) {
+                const previousValue = model.interactionModel.languageModel.types[0].values[foundIndex - 1];
+                logger.info('found previous webcam', previousValue);
+                return getResponseFor(handlerInput, { id: previousValue.id, name: previousValue.name.value });
+            } else if (foundIndex === 0) {
+                const noOfWebcams = model.interactionModel.languageModel.types[0].values.length;
+                const lastValue = model.interactionModel.languageModel.types[0].values[noOfWebcams - 1];
+                logger.info('wrapping around to last webcam', lastValue);
+                return getResponseFor(handlerInput, { id: lastValue.id, name: lastValue.name.value });
+            } else {
+                // should never happen
+                logger.error('no match for last webcam', sessionAttributes.value);
+                // just reuse the value
+                return getResponseFor(handlerInput, sessionAttributes.value);
+            }
+        }
+
+        // no webcam was shown previously, so just respond with help message
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        return handlerInput.responseBuilder
+            .speak(requestAttributes.t('HELP_MESSAGE'))
+            .reprompt(requestAttributes.t('HELP_REPROMPT'))
+            .getResponse();
     },
 };
 
@@ -192,8 +231,35 @@ const NextIntentHandler = {
         const { request } = handlerInput.requestEnvelope;
         logger.debug('request', request);
 
-        // TODO: Store cam from WeatherCamIntentHandler in session and then use proper next cam here
-        return getResponseFor(handlerInput, { id: 'Warnemuende-NW', name: 'Warnemünde Nordwest' });
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        if (sessionAttributes.value) {
+            logger.debug('last webcam', sessionAttributes.value);
+            const foundIndex = model.interactionModel.languageModel.types[0].values.findIndex(value => {
+                return value.id === sessionAttributes.value.id;
+            });
+            const noOfWebcams = model.interactionModel.languageModel.types[0].values.length;
+            if (foundIndex === noOfWebcams - 1) {
+                const firstValue = model.interactionModel.languageModel.types[0].values[0];
+                logger.info('wrapping around to first webcam', firstValue);
+                return getResponseFor(handlerInput, { id: firstValue.id, name: firstValue.name.value });
+            } else if (foundIndex >= 0) {
+                const nextValue = model.interactionModel.languageModel.types[0].values[foundIndex + 1];
+                logger.info('found next webcam', nextValue);
+                return getResponseFor(handlerInput, { id: nextValue.id, name: nextValue.name.value });
+            } else {
+                // should never happen
+                logger.error('no match for last webcam', sessionAttributes.value);
+                // just reuse the value
+                return getResponseFor(handlerInput, sessionAttributes.value);
+            }
+        }
+
+        // no webcam was shown previously, so just respond with help message
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        return handlerInput.responseBuilder
+            .speak(requestAttributes.t('HELP_MESSAGE'))
+            .reprompt(requestAttributes.t('HELP_REPROMPT'))
+            .getResponse();
     },
 };
 
