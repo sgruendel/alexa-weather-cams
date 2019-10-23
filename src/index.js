@@ -16,7 +16,7 @@ const logger = winston.createLogger({
     exitOnError: false,
 });
 
-const model = process.env.DASHBOT_API_KEY ? require('models/de-DE') : require('../models/de-DE');
+const model = process.env.DASHBOT_API_KEY ? require('./models/de-DE') : require('../models/de-DE');
 
 const SKILL_ID = 'amzn1.ask.skill.6896cced-41a6-4134-912d-c74db2be8559';
 const ER_SUCCESS_MATCH = 'ER_SUCCESS_MATCH';
