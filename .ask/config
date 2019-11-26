@@ -6,16 +6,16 @@
       "merge": {},
       "resources": {
         "manifest": {
-          "eTag": "0a886924c4ec5567aa8e2c27575e815c"
+          "eTag": "92ed79af1b15a6ec0f9e29fe41bcad6b"
         },
         "interactionModel": {
           "de-DE": {
-            "eTag": "18ee2c1de88f997d0eb6a1a25cf7f4fd"
+            "eTag": "7415681447740e2f7cdc139686e563bd"
           }
         },
         "lambda": [
           {
-            "arn": "arn:aws:lambda:eu-west-1:467353799488:function:weatherCams:6",
+            "arn": "arn:aws:lambda:eu-west-1:467353799488:function:weatherCams:19",
             "awsRegion": "eu-west-1",
             "functionName": "weatherCams",
             "alexaUsage": [
@@ -24,7 +24,7 @@
             "revisionId": "594c10d1-8eda-48d1-ad92-1b33db944b0a",
             "codeUri": "src",
             "handler": "index.handler",
-            "runtime": "nodejs8.10"
+            "runtime": "nodejs12.x"
           }
         ]
       }

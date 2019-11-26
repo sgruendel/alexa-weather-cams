@@ -29,24 +29,27 @@
                 "{webcam}",
                 "für {webcam}",
                 "in {webcam}",
+                "mit {webcam}",
+                "nach {webcam}",
                 "von {webcam}"
               ]
             }
           ],
           "samples": [
-            "{webcam}",
             "für {webcam}",
             "in {webcam}",
             "mit {webcam}",
+            "nach {webcam}",
             "von {webcam}",
+            "am Standort {webcam}",
+            "für Standort {webcam}",
+            "für den Standort {webcam}",
             "der Kamera {webcam}",
             "der Kamera für {webcam}",
             "der Kamera in {webcam}",
             "der Kamera von {webcam}",
-            "nach der Kamera {webcam}",
-            "nach der Kamera für {webcam}",
-            "nach der Kamera in {webcam}",
-            "nach der Kamera von {webcam}"
+            "zeige {webcam}",
+            "zeige mir {webcam}"
           ]
         },
         {
@@ -242,7 +245,8 @@
             }
           ]
         }
-      ]
+      ],
+      "delegationStrategy": "SKILL_RESPONSE"
     },
     "prompts": [
       {
