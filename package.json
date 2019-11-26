@@ -1,6 +1,6 @@
 {
   "name": "alexa-weather-cams",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Alexa Skill to view DWD weather webcams",
   "main": "index.js",
   "scripts": {
@@ -32,16 +32,16 @@
   "homepage": "https://github.com/sgruendel/alexa-weather-cams#readme",
   "dependencies": {
     "ask-sdk-core": "^2.7.0",
-    "ask-sdk-model": "^1.18.0",
-    "dashbot": "^10.4.2",
-    "i18next": "^17.0.10",
+    "ask-sdk-model": "^1.24.0",
+    "dashbot": "^10.4.0",
+    "i18next": "^19.0.1",
     "i18next-sprintf-postprocessor": "^0.2.2",
     "winston": "^3.2.1"
   },
   "devDependencies": {
     "alexa-skill-test-framework": "^1.2.4",
     "chai": "^4.2.0",
-    "eslint": "^6.1.0",
+    "eslint": "^6.7.1",
     "eslint-config-strongloop": "^2.1.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1"
