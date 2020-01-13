@@ -26,6 +26,17 @@ describe('Wetterkamera Skill', () => {
         ]);
     });
 
+    describe('FallbackIntent', () => {
+        alexaTest.test([
+            {
+                request: alexaTest.getIntentRequest('AMAZON.FallbackIntent'),
+                says: 'Dort gibt es leider keine DWD-Wetterkamera. Ich kann dir die Bilder von Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde zeigen. Welche Kamera soll ich anzeigen?',
+                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
+                shouldEndSession: false,
+            },
+        ]);
+    });
+
     describe('HelpIntent', () => {
         alexaTest.test([
             {

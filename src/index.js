@@ -26,6 +26,7 @@ const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
 const languageStrings = {
     de: {
         translation: {
+            FALLBACK_MESSAGE: 'Dort gibt es leider keine DWD-Wetterkamera. Ich kann dir die Bilder von Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde zeigen. Welche Kamera soll ich anzeigen?',
             HELP_MESSAGE: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde zeigen. Welche Kamera soll ich anzeigen?',
             HELP_REPROMPT: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
             STOP_MESSAGE: '<say-as interpret-as="interjection">bis dann</say-as>.',
@@ -124,10 +125,10 @@ const WeatherCamIntentHandler = {
                 }
 
                 logger.info('multiple matches for ' + slots.webcam.value);
-                var prompt = 'Welche Kamera';
+                let prompt = 'Welche Kamera';
                 const size = rpa.values.length;
 
-                var names = [];
+                let names = [];
                 rpa.values.forEach((element, index) => {
                     prompt += ((index === size - 1) ? ' oder ' : ', ') + element.value.name;
                     names.push(element.value.name);
@@ -155,6 +156,23 @@ const WeatherCamIntentHandler = {
         logger.info('webcam value', value);
 
         return getResponseFor(handlerInput, value);
+    },
+};
+
+const FallbackIntentHandler = {
+    canHandle(handlerInput) {
+        const { request } = handlerInput.requestEnvelope;
+        return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.FallbackIntent';
+    },
+    handle(handlerInput) {
+        const { request } = handlerInput.requestEnvelope;
+        logger.debug('request', request);
+
+        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
+        return handlerInput.responseBuilder
+            .speak(requestAttributes.t('FALLBACK_MESSAGE'))
+            .reprompt(requestAttributes.t('HELP_REPROMPT'))
+            .getResponse();
     },
 };
 
@@ -328,6 +346,7 @@ const LocalizationInterceptor = {
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         WeatherCamIntentHandler,
+        FallbackIntentHandler,
         HelpIntentHandler,
         PreviousIntentHandler,
         NextIntentHandler,

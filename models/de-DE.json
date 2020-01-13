@@ -91,6 +91,10 @@
         {
           "name": "AMAZON.ScrollUpIntent",
           "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
         }
       ],
       "types": [
@@ -268,5 +272,6 @@
         ]
       }
     ]
-  }
+  },
+  "version": "47"
 }
