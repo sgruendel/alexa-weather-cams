@@ -35,7 +35,7 @@
   "dependencies": {
     "ask-sdk-core": "^2.7.0",
     "ask-sdk-model": "^1.25.1",
-    "dashbot": "^10.4.0",
+    "dashbot": "^11.1.0",
     "i18next": "^19.0.3",
     "i18next-sprintf-postprocessor": "^0.2.2",
     "winston": "^3.2.1"
