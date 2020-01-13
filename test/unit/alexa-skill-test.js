@@ -8,7 +8,7 @@ const LIST_OF_WEBCAMS = 'LIST_OF_WEBCAMS';
 
 // initialize the testing framework
 alexaTest.initialize(
-    require('../src/index'),
+    require('../../src/index'),
     'amzn1.ask.skill.6896cced-41a6-4134-912d-c74db2be8559',
     'amzn1.ask.account.VOID');
 alexaTest.setLocale('de-DE');
