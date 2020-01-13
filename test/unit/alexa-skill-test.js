@@ -30,8 +30,8 @@ describe('Wetterkamera Skill', () => {
         alexaTest.test([
             {
                 request: alexaTest.getIntentRequest('AMAZON.FallbackIntent'),
-                says: 'Dort gibt es leider keine DWD-Wetterkamera. Ich kann dir die Bilder von Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde zeigen. Welche Kamera soll ich anzeigen?',
-                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
+                says: 'Dort gibt es leider keine DWD-Wetterkamera. Ich kann dir die Bilder von Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde und der Wasserkuppe zeigen. Welche Kamera soll ich anzeigen?',
+                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde oder Wasserkuppe?',
                 shouldEndSession: false,
             },
         ]);
@@ -41,8 +41,8 @@ describe('Wetterkamera Skill', () => {
         alexaTest.test([
             {
                 request: alexaTest.getIntentRequest('AMAZON.HelpIntent'),
-                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde zeigen. Welche Kamera soll ich anzeigen?',
-                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
+                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde und auf der Wasserkuppe zeigen. Welche Kamera soll ich anzeigen?',
+                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde oder Wasserkuppe?',
                 shouldEndSession: false,
             },
         ]);
@@ -52,8 +52,8 @@ describe('Wetterkamera Skill', () => {
         alexaTest.test([
             {
                 request: alexaTest.getIntentRequest('AMAZON.PreviousIntent'),
-                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde zeigen. Welche Kamera soll ich anzeigen?',
-                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
+                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde und auf der Wasserkuppe zeigen. Welche Kamera soll ich anzeigen?',
+                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde oder Wasserkuppe?',
                 shouldEndSession: false,
             },
         ]);
@@ -74,11 +74,11 @@ describe('Wetterkamera Skill', () => {
             },
             {
                 request: alexaTest.getIntentRequest('AMAZON.PreviousIntent'),
-                says: 'Hier ist die Kamera Warnemünde Nordwest.',
-                hasCardTitle: 'Warnemünde Nordwest',
+                says: 'Hier ist die Kamera Wasserkuppe Südwest.',
+                hasCardTitle: 'Wasserkuppe Südwest',
                 hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_180.jpg',
+                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Wasserkuppe-SW/Wasserkuppe-SW_latest_114.jpg',
+                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Wasserkuppe-SW/Wasserkuppe-SW_latest_180.jpg',
                 repromptsNothing: true, shouldEndSession: true,
             },
         ]);
@@ -113,8 +113,8 @@ describe('Wetterkamera Skill', () => {
         alexaTest.test([
             {
                 request: alexaTest.getIntentRequest('AMAZON.NextIntent'),
-                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde zeigen. Welche Kamera soll ich anzeigen?',
-                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
+                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde und auf der Wasserkuppe zeigen. Welche Kamera soll ich anzeigen?',
+                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde oder Wasserkuppe?',
                 shouldEndSession: false,
             },
         ]);
@@ -145,17 +145,17 @@ describe('Wetterkamera Skill', () => {
         ]);
     });
 
-    describe('NextIntent for Warnemünde Nordwest', () => {
+    describe('NextIntent for Wasserkuppe Südwest', () => {
         alexaTest.test([
             {
                 request: alexaTest.addEntityResolutionToRequest(
-                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Warnemünde Nordwest' }),
-                    'webcam', LIST_OF_WEBCAMS, 'Warnemünde Nordwest', 'Warnemuende-NW'),
-                says: 'Hier ist die Kamera Warnemünde Nordwest.',
-                hasCardTitle: 'Warnemünde Nordwest',
+                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Wasserkuppe Südwest' }),
+                    'webcam', LIST_OF_WEBCAMS, 'Wasserkuppe Südwest', 'Wasserkuppe-SW'),
+                says: 'Hier ist die Kamera Wasserkuppe Südwest.',
+                hasCardTitle: 'Wasserkuppe Südwest',
                 hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_180.jpg',
+                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Wasserkuppe-SW/Wasserkuppe-SW_latest_114.jpg',
+                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Wasserkuppe-SW/Wasserkuppe-SW_latest_180.jpg',
                 repromptsNothing: true, shouldEndSession: true,
             },
             {
@@ -208,7 +208,7 @@ describe('Wetterkamera Skill', () => {
             {
                 request: alexaTest.getLaunchRequest(),
                 says: 'Welche Kamera soll ich anzeigen?',
-                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Offenbach, Schmücke oder Warnemünde?',
+                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde oder Wasserkuppe?',
                 shouldEndSession: false,
             },
         ]);

@@ -31,7 +31,9 @@
                 "in {webcam}",
                 "mit {webcam}",
                 "nach {webcam}",
-                "von {webcam}"
+                "von {webcam}",
+                "der {webcam}",
+                "auf der {webcam}"
               ]
             }
           ],
@@ -41,6 +43,8 @@
             "mit {webcam}",
             "nach {webcam}",
             "von {webcam}",
+            "der {webcam}",
+            "auf der {webcam}",
             "am Standort {webcam}",
             "für Standort {webcam}",
             "für den Standort {webcam}",
@@ -48,6 +52,8 @@
             "der Kamera für {webcam}",
             "der Kamera in {webcam}",
             "der Kamera von {webcam}",
+            "der Kamera der {webcam}",
+            "der Kamera auf der {webcam}",
             "zeige {webcam}",
             "zeige mir {webcam}"
           ]
@@ -157,6 +163,20 @@
               }
             },
             {
+              "id": "Lindenberg-NNE",
+              "name": {
+                "value": "Lindenberg Nordnordost",
+                "synonyms": [
+                  "Lindenberg",
+                  "Lindenberg Nordnordosten",
+                  "Lindenberg Blick nach Nordnordost",
+                  "Lindenberg Blick nach Nordnordosten",
+                  "Lindenberg Blickrichtung Nordnordost",
+                  "Lindenberg Blickrichtung Nordnordosten"
+                ]
+              }
+            },
+            {
               "id": "Offenbach-O",
               "name": {
                 "value": "Offenbach Ost",
@@ -220,6 +240,20 @@
                   "Rostock Warnemünde Blickrichtung Nordwesten"
                 ]
               }
+            },
+            {
+              "id": "Wasserkuppe-SW",
+              "name": {
+                "value": "Wasserkuppe Südwest",
+                "synonyms": [
+                  "Wasserkuppe",
+                  "Wasserkuppe Südwesten",
+                  "Wasserkuppe Blick nach Südwest",
+                  "Wasserkuppe Blick nach Südwesten",
+                  "Wasserkuppe Blickrichtung Südwest",
+                  "Wasserkuppe Blickrichtung Südwesten"
+                ]
+              }
             }
           ]
         }
@@ -273,5 +307,5 @@
       }
     ]
   },
-  "version": "47"
+  "version": "48"
 }

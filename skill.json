@@ -32,7 +32,7 @@
           "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/893f/31dea8aa14cc4f7ba9be784a8a72003c/APP_ICON?versionId=lh7WXm3I80FvrfinqBQtkuT0rwrch6lU&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190808T121855Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190808%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=6f82492d6ad2d9ffeae9cb50f8bc9ed00c94220e2521b3d63ac1f9d60567e05f",
           "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/2c34/e7f4c5d51a5e463dba6c6163678bea4c/APP_ICON_LARGE?versionId=EqD0FGbr3yG09f1kuUOHKUVb_oJiEhiy&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20190808T121855Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAJFEYRBGIHK2BBYKA%2F20190808%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=2200ef10afbbab73efea4faf6c54136a884029df5b17a9165a2d16a66874dd96",
           "summary": "Öffentliche Wetterkameras vom DWD",
-          "description": "Dieser Skill funktioniert nur sinnvoll mit dem Echo Show oder Echo Spot.\n\nEs werden die aktuellen Aufnahmen der öffentlichen Wetterkameras vom DWD (Deutscher Wetterdienst) angezeigt, Aufruf über\n\"Alexa, frage Wetterkamera nach Hamburg elbabwärts\"\noder\n\"Alexa, frage Wetterkamera nach Schmücke\"\n\nDWD-Wetterkameras stehen in Hamburg, Hohenpeißenberg, Offenbach, Schmücke und Warnemünde.\n\nQuelle: Deutscher Wetterdienst\n\nVerbesserungsvorschläge und Feedback gerne unter https://github.com/sgruendel/alexa-weather-cams/issues/new.",
+          "description": "Dieser Skill funktioniert nur sinnvoll mit dem Echo Show oder Echo Spot.\n\nEs werden die aktuellen Aufnahmen der öffentlichen Wetterkameras vom DWD (Deutscher Wetterdienst) angezeigt, Aufruf über\n\"Alexa, frage Wetterkamera nach Hamburg elbabwärts\"\noder\n\"Alexa, frage Wetterkamera nach Schmücke\"\n\nDWD-Wetterkameras stehen in Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde und auf der Wasserkuppe.\n\nQuelle: Deutscher Wetterdienst\n\nVerbesserungsvorschläge und Feedback gerne unter https://github.com/sgruendel/alexa-weather-cams/issues/new.",
           "examplePhrases": [
             "Alexa, öffne Wetterkamera",
             "Alexa, frage Wetterkamera nach Hamburg elbabwärts",
@@ -44,11 +44,11 @@
             "wetter",
             "wetterkamera"
           ],
-          "updatesDescription": "Mit \"Alexa nächste\" und \"Alexa vorher\" kann jetzt zur nächsten bzw. vorherigen Kamera gewechselt werden."
+          "updatesDescription": "Neue Kameras in Lindenberg und auf der Wasserkuppe."
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Aktuelle Bilder siehe https://www.dwd.de/DE/wetter/wetterundklima_vorort/wetterkameras/wetter_cams.html\n\nÄnderungen gegenüber vorheriger Version (Lambda Version 3):\n* Unterstützung von PreviousIntent und NextIntent",
+      "testingInstructions": "Aktuelle Bilder siehe https://www.dwd.de/DE/wetter/wetterundklima_vorort/wetterkameras/wetter_cams.html\n\nÄnderungen gegenüber vorheriger Version (Lambda Version 19):\n* Neue Kameras in Lindenberg und auf der Wasserkuppe",
       "category": "WEATHER",
       "distributionCountries": []
     }
