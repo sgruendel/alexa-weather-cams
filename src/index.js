@@ -34,6 +34,11 @@ const languageStrings = {
         },
     },
 };
+i18next.use(sprintf).init({
+    overloadTranslationOptionHandler: sprintf.overloadTranslationOptionHandler,
+    resources: languageStrings,
+    returnObjects: true,
+});
 
 function getResponseFor(handlerInput, value) {
     const baseUrl = 'https://opendata.dwd.de/weather/webcam/' + value.id + '/' + value.id + '_latest_';
@@ -328,12 +333,7 @@ const ErrorHandler = {
 
 const LocalizationInterceptor = {
     process(handlerInput) {
-        i18next.use(sprintf).init({
-            lng: Alexa.getLocale(handlerInput.requestEnvelope),
-            overloadTranslationOptionHandler: sprintf.overloadTranslationOptionHandler,
-            resources: languageStrings,
-            returnObjects: true,
-        });
+        i18next.changeLanguage(Alexa.getLocale(handlerInput.requestEnvelope));
 
         const attributes = handlerInput.attributesManager.getRequestAttributes();
         attributes.t = (...args) => {
