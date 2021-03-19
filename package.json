@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/sgruendel/alexa-weather-cams#readme",
   "dependencies": {
-    "ask-sdk-core": "2.10.1",
+    "ask-sdk-core": "2.10.2",
     "ask-sdk-model": "1.34.1",
     "i18next": "19.9.2",
     "i18next-sprintf-postprocessor": "0.2.2",
@@ -41,10 +41,10 @@
   },
   "devDependencies": {
     "alexa-skill-test-framework": "1.2.4",
-    "chai": "4.3.3",
-    "eslint": "7.21.0",
+    "chai": "4.3.4",
+    "eslint": "7.22.0",
     "eslint-config-strongloop": "2.1.0",
-    "mocha": "8.3.1",
+    "mocha": "8.3.2",
     "nyc": "15.1.0"
   },
   "eslintConfig": {
