@@ -35,14 +35,14 @@
   "dependencies": {
     "ask-sdk-core": "2.10.2",
     "ask-sdk-model": "1.35.1",
-    "i18next": "20.2.4",
+    "i18next": "20.3.0",
     "i18next-sprintf-postprocessor": "0.2.2",
     "winston": "3.3.3"
   },
   "devDependencies": {
     "alexa-skill-test-framework": "1.2.4",
     "chai": "4.3.4",
-    "eslint": "7.26.0",
+    "eslint": "7.27.0",
     "eslint-config-strongloop": "2.1.0",
     "mocha": "8.4.0",
     "nyc": "15.1.0"
