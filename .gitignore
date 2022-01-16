@@ -61,4 +61,4 @@ typings/
 .next
 
 # Deployment artifacts
-index.zip
+.ask/

@@ -4,15 +4,10 @@
   "description": "Alexa Skill to view DWD weather webcams",
   "main": "index.js",
   "scripts": {
-    "invoke": "aws lambda invoke --function-name weatherCams --payload fileb://test/events/alexa-start-session.json test/out.txt && cat test/out.txt",
+    "reinstall": "rm -rf ./node_modules && npm install",
     "test:unit": "nyc --reporter=lcov --reporter=text mocha test/unit/*",
     "test:integration": "mocha --timeout=20000 test/integration/*",
-    "test": "npm run test:unit",
-    "deploy-lambda": "npm prune --production && npm run lambda-zip && npm run lambda-update && npm install",
-    "lambda-zip": "zip -x 'node_modules/.cache/*' -r index.zip node_modules models && cd src && zip ../index.zip *",
-    "lambda-update": "aws lambda update-function-code --function-name weatherCams --zip-file fileb://index.zip",
-    "deploy-skill": "ask deploy --target skill",
-    "deploy-model": "ask deploy --target model"
+    "test": "npm run test:unit"
   },
   "repository": {
     "type": "git",
@@ -49,10 +44,11 @@
   },
   "eslintConfig": {
     "parserOptions": {
-      "ecmaVersion": 2017
+      "ecmaVersion": 2020
     },
     "extends": "strongloop",
     "env": {
+      "commonjs": true,
       "es6": true,
       "node": true,
       "mocha": true
