@@ -29,8 +29,8 @@
   "homepage": "https://github.com/sgruendel/alexa-weather-cams#readme",
   "dependencies": {
     "ask-sdk-core": "2.12.1",
-    "ask-sdk-model": "1.38.1",
-    "i18next": "21.8.2",
+    "ask-sdk-model": "1.38.2",
+    "i18next": "21.8.3",
     "i18next-sprintf-postprocessor": "0.2.2",
     "winston": "3.7.2"
   },
