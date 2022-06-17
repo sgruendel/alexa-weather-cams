@@ -30,7 +30,7 @@
   "dependencies": {
     "ask-sdk-core": "2.12.1",
     "ask-sdk-model": "1.38.2",
-    "i18next": "21.8.9",
+    "i18next": "21.8.10",
     "i18next-sprintf-postprocessor": "0.2.2",
     "winston": "3.7.2"
   },
