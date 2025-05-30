@@ -30,7 +30,7 @@
   "dependencies": {
     "ask-sdk-core": "^2.14.0",
     "ask-sdk-model": "^1.86.0",
-    "i18next": "^25.2.0",
+    "i18next": "^25.2.1",
     "i18next-sprintf-postprocessor": "^0.2.2",
     "winston": "^3.17.0"
   },
@@ -39,7 +39,7 @@
     "chai": "^5.2.0",
     "eslint": "^9.27.0",
     "eslint-config-strongloop": "^2.1.0",
-    "mocha": "^11.4.0",
+    "mocha": "^11.5.0",
     "nyc": "^17.1.0"
   },
   "eslintConfig": {
