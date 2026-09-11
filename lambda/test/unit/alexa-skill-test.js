@@ -226,7 +226,7 @@ describe('Wetterkamera Skill', () => {
         const suedwest = resolvedSlot('webcam', 'Südwest', [
             { name: 'Hamburg Südwest', id: 'Hamburg-SW' },
             { name: 'Schmücke Südwest', id: 'Schmuecke-SW' },
-            { name: 'Hohenpeißenberg Südwest', id: 'Hohenpeissenberg-SW' },
+            { name: 'Wasserkuppe Südwest', id: 'Wasserkuppe-SW' },
         ]);
 
         const result = await handler(

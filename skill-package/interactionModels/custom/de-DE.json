@@ -142,23 +142,11 @@
               "name": {
                 "value": "Hohenpeißenberg Süd",
                 "synonyms": [
+                  "Hohenpeißenberg",
                   "Hohenpeißenberg Süden",
                   "Hohenpeißenberg Blick nach Süden",
                   "Hohenpeißenberg Blickrichtung Süd",
                   "Hohenpeißenberg Blickrichtung Süden"
-                ]
-              }
-            },
-            {
-              "id": "Hohenpeissenberg-SW",
-              "name": {
-                "value": "Hohenpeißenberg Südwest",
-                "synonyms": [
-                  "Hohenpeißenberg Südwesten",
-                  "Hohenpeißenberg Blick nach Südwest",
-                  "Hohenpeißenberg Blick nach Südwesten",
-                  "Hohenpeißenberg Blickrichtung Südwest",
-                  "Hohenpeißenberg Blickrichtung Südwesten"
                 ]
               }
             },
