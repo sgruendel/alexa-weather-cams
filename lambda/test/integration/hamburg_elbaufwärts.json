@@ -1,0 +1,9 @@
+{
+  "skillId": "amzn1.ask.skill.6896cced-41a6-4134-912d-c74db2be8559",
+  "locale": "de-DE",
+  "type": "text",
+  "userInput": [
+    "starte Wetterkamera und frage nach Hamburg elbaufwärts",
+    ".quit"
+  ]
+}
