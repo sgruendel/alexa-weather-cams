@@ -15,7 +15,7 @@ const logger = winston.createLogger({
     exitOnError: false,
 });
 
-const model = require('../skill-package/interactionModels/custom/de-DE');
+const model = require('./de-DE');
 
 const SKILL_ID = 'amzn1.ask.skill.6896cced-41a6-4134-912d-c74db2be8559';
 const ER_SUCCESS_MATCH = 'ER_SUCCESS_MATCH';
