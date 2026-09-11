@@ -3,11 +3,13 @@
   "version": "1.3.0",
   "description": "Alexa Skill to view DWD weather webcams",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "reinstall": "rm -rf ./node_modules && npm install",
-    "test:unit": "c8 --reporter=lcov --reporter=text mocha test/unit/*",
-    "test:integration": "mocha --timeout=20000 test/integration/*",
-    "test": "npm run test:unit"
+    "test:unit": "node --env-file-if-exists=.env ./node_modules/c8/bin/c8.js --reporter=lcov --reporter=text mocha --timeout=7000 --file test/setup.js test/unit/*",
+    "test:integration": "node --env-file-if-exists=.env ./node_modules/mocha/bin/mocha.js --timeout=20000 test/integration/*",
+    "test": "npm run test:unit",
+    "model:deploy": "node --env-file-if-exists=.env scripts/deploy-model.js"
   },
   "repository": {
     "type": "git",
@@ -35,40 +37,12 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
-    "alexa-skill-test-framework": "^1.2.4",
+    "@eslint/js": "^10.0.1",
     "c8": "^12.0.0",
     "chai": "^6.2.2",
     "eslint": "^10.10.0",
-    "eslint-config-strongloop": "^2.1.0",
-    "mocha": "^12.0.0"
-  },
-  "eslintConfig": {
-    "parserOptions": {
-      "ecmaVersion": 2020
-    },
-    "extends": "strongloop",
-    "env": {
-      "commonjs": true,
-      "es6": true,
-      "node": true,
-      "mocha": true
-    },
-    "rules": {
-      "indent": [
-        "error",
-        4
-      ],
-      "max-len": [
-        "error",
-        120,
-        4,
-        {
-          "ignoreComments": true,
-          "ignoreUrls": true,
-          "ignoreStrings": true,
-          "ignorePattern": "^\\s*var\\s.+=\\s*(require\\s*\\()|(/)"
-        }
-      ]
-    }
+    "globals": "^17.12.0",
+    "mocha": "^12.0.0",
+    "nock": "^14.0.17"
   }
 }

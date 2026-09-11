@@ -1,293 +1,241 @@
-'use strict';
+import { expect } from 'chai';
 
-// include the testing framework
-const alexaTest = require('alexa-skill-test-framework');
+import { handler } from '../../index.js';
+import { intentRequest, launchRequest, resolvedSlot, sessionEndedRequest } from '../helpers/alexa.js';
 
-// custom slot types
-const LIST_OF_WEBCAMS = 'LIST_OF_WEBCAMS';
+const FALLBACK_MESSAGE = 'Dort gibt es leider keine DWD-Wetterkamera.'
+    + ' Ich kann dir die Bilder von Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde'
+    + ' und der Wasserkuppe zeigen. Welche Kamera soll ich anzeigen?';
+const HELP_MESSAGE = 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Lindenberg,'
+    + ' Offenbach, Schmücke, Warnemünde und auf der Wasserkuppe zeigen. Welche Kamera soll ich anzeigen?';
+const HELP_REPROMPT = 'Welche DWD-Wetterkamera soll ich anzeigen,'
+    + ' Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde oder Wasserkuppe?';
+const STOP_MESSAGE = 'bis dann';
 
-// initialize the testing framework
-alexaTest.initialize(
-    require('../../index'),
-    'amzn1.ask.skill.6896cced-41a6-4134-912d-c74db2be8559',
-    'amzn1.ask.account.VOID');
-alexaTest.setLocale('de-DE');
+function speech(responseEnvelope) {
+    return responseEnvelope.response.outputSpeech.ssml;
+}
+
+function expectWebcamResponse(result, name, id) {
+    expect(speech(result)).to.contain(`Hier ist die Kamera ${name}.`);
+    expect(result.response.card).to.include({ type: 'Standard', title: name });
+    expect(result.response.card.text, 'card text').to.have.string('Quelle: Deutscher Wetterdienst');
+    expect(result.response.card.image, 'card image').to.deep.equal({
+        smallImageUrl: `https://opendata.dwd.de/weather/webcam/${id}/${id}_latest_114.jpg`,
+        largeImageUrl: `https://opendata.dwd.de/weather/webcam/${id}/${id}_latest_180.jpg`,
+    });
+    expect(result.response).to.not.have.property('reprompt');
+    expect(result.response.shouldEndSession).to.equal(true);
+}
 
 describe('Wetterkamera Skill', () => {
 
-    describe('ErrorHandler', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getIntentRequest(''),
-                says: 'Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?',
-                reprompts: 'Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?',
-                shouldEndSession: false,
-            },
-        ]);
+    it('uses the error handler for unsupported intents', async () => {
+        const result = await handler(intentRequest('UnsupportedIntent'), {});
+
+        expect(speech(result)).to.contain('Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?');
+        expect(result.response.reprompt.outputSpeech.ssml)
+            .to.contain('Entschuldigung, das verstehe ich nicht. Bitte wiederhole das?');
+        expect(result.response.shouldEndSession).to.equal(false);
     });
 
-    describe('FallbackIntent', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getIntentRequest('AMAZON.FallbackIntent'),
-                says: 'Dort gibt es leider keine DWD-Wetterkamera. Ich kann dir die Bilder von Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde und der Wasserkuppe zeigen. Welche Kamera soll ich anzeigen?',
-                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde oder Wasserkuppe?',
-                shouldEndSession: false,
-            },
-        ]);
+    it('handles the fallback intent', async () => {
+        const result = await handler(intentRequest('AMAZON.FallbackIntent'), {});
+
+        expect(speech(result)).to.contain(FALLBACK_MESSAGE);
+        expect(result.response.reprompt.outputSpeech.ssml).to.contain(HELP_REPROMPT);
+        expect(result.response.shouldEndSession).to.equal(false);
     });
 
-    describe('HelpIntent', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getIntentRequest('AMAZON.HelpIntent'),
-                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde und auf der Wasserkuppe zeigen. Welche Kamera soll ich anzeigen?',
-                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde oder Wasserkuppe?',
-                shouldEndSession: false,
-            },
-        ]);
+    it('handles the help intent', async () => {
+        const result = await handler(intentRequest('AMAZON.HelpIntent'), {});
+
+        expect(speech(result)).to.contain(HELP_MESSAGE);
+        expect(result.response.reprompt.outputSpeech.ssml).to.contain(HELP_REPROMPT);
+        expect(result.response.shouldEndSession).to.equal(false);
     });
 
-    describe('PreviousIntent', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getIntentRequest('AMAZON.PreviousIntent'),
-                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde und auf der Wasserkuppe zeigen. Welche Kamera soll ich anzeigen?',
-                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde oder Wasserkuppe?',
-                shouldEndSession: false,
-            },
-        ]);
+    it('shows the help message for the previous intent without a webcam', async () => {
+        const result = await handler(intentRequest('AMAZON.PreviousIntent'), {});
+
+        expect(speech(result)).to.contain(HELP_MESSAGE);
+        expect(result.response.reprompt.outputSpeech.ssml).to.contain(HELP_REPROMPT);
+        expect(result.response.shouldEndSession).to.equal(false);
     });
 
-    describe('PreviousIntent for Hamburg Südost', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.addEntityResolutionToRequest(
-                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Hamburg Südost' }),
-                    'webcam', LIST_OF_WEBCAMS, 'Hamburg Südost', 'Hamburg-SO'),
-                says: 'Hier ist die Kamera Hamburg Südost.',
-                hasCardTitle: 'Hamburg Südost',
-                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_180.jpg',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-            {
-                request: alexaTest.getIntentRequest('AMAZON.PreviousIntent'),
-                says: 'Hier ist die Kamera Wasserkuppe Südwest.',
-                hasCardTitle: 'Wasserkuppe Südwest',
-                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Wasserkuppe-SW/Wasserkuppe-SW_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Wasserkuppe-SW/Wasserkuppe-SW_latest_180.jpg',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-        ]);
+    it('shows the previous webcam for Hamburg Südost', async () => {
+        const webcam = resolvedSlot('webcam', 'Hamburg Südost', [{ name: 'Hamburg Südost', id: 'Hamburg-SO' }]);
+
+        const first = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
+        expectWebcamResponse(first, 'Hamburg Südost', 'Hamburg-SO');
+
+        const result = await handler(
+            intentRequest('AMAZON.PreviousIntent', {}, 'COMPLETED', {
+                sessionNew: false,
+                attributes: first.sessionAttributes,
+            }),
+            {},
+        );
+        expectWebcamResponse(result, 'Wasserkuppe Südwest', 'Wasserkuppe-SW');
     });
 
-    describe('PreviousIntent for Warnemünde Nordwest', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.addEntityResolutionToRequest(
-                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Warnemünde Nordwest' }),
-                    'webcam', LIST_OF_WEBCAMS, 'Warnemünde Nordwest', 'Warnemuende-NW'),
-                says: 'Hier ist die Kamera Warnemünde Nordwest.',
-                hasCardTitle: 'Warnemünde Nordwest',
-                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Warnemuende-NW/Warnemuende-NW_latest_180.jpg',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-            {
-                request: alexaTest.getIntentRequest('AMAZON.PreviousIntent'),
-                says: 'Hier ist die Kamera Schmücke Südwest.',
-                hasCardTitle: 'Schmücke Südwest',
-                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Schmuecke-SW/Schmuecke-SW_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Schmuecke-SW/Schmuecke-SW_latest_180.jpg',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-        ]);
+    it('shows the previous webcam for Warnemünde Nordwest', async () => {
+        const webcam = resolvedSlot(
+            'webcam', 'Warnemünde Nordwest', [{ name: 'Warnemünde Nordwest', id: 'Warnemuende-NW' }]);
+
+        const first = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
+        expectWebcamResponse(first, 'Warnemünde Nordwest', 'Warnemuende-NW');
+
+        const result = await handler(
+            intentRequest('AMAZON.PreviousIntent', {}, 'COMPLETED', {
+                sessionNew: false,
+                attributes: first.sessionAttributes,
+            }),
+            {},
+        );
+        expectWebcamResponse(result, 'Schmücke Südwest', 'Schmuecke-SW');
     });
 
-    describe('NextIntent', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getIntentRequest('AMAZON.NextIntent'),
-                says: 'Ich kann dir die Bilder von den DWD-Wetterkameras in Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde und auf der Wasserkuppe zeigen. Welche Kamera soll ich anzeigen?',
-                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde oder Wasserkuppe?',
-                shouldEndSession: false,
-            },
-        ]);
+    it('shows the help message for the next intent without a webcam', async () => {
+        const result = await handler(intentRequest('AMAZON.NextIntent'), {});
+
+        expect(speech(result)).to.contain(HELP_MESSAGE);
+        expect(result.response.reprompt.outputSpeech.ssml).to.contain(HELP_REPROMPT);
+        expect(result.response.shouldEndSession).to.equal(false);
     });
 
-    describe('NextIntent for Hamburg Südost', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.addEntityResolutionToRequest(
-                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Hamburg Südost' }),
-                    'webcam', LIST_OF_WEBCAMS, 'Hamburg Südost', 'Hamburg-SO'),
-                says: 'Hier ist die Kamera Hamburg Südost.',
-                hasCardTitle: 'Hamburg Südost',
-                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_180.jpg',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-            {
-                request: alexaTest.getIntentRequest('AMAZON.NextIntent'),
-                says: 'Hier ist die Kamera Hamburg Südwest.',
-                hasCardTitle: 'Hamburg Südwest',
-                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_180.jpg',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-        ]);
+    it('shows the next webcam for Hamburg Südost', async () => {
+        const webcam = resolvedSlot('webcam', 'Hamburg Südost', [{ name: 'Hamburg Südost', id: 'Hamburg-SO' }]);
+
+        const first = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
+        expectWebcamResponse(first, 'Hamburg Südost', 'Hamburg-SO');
+
+        const result = await handler(
+            intentRequest('AMAZON.NextIntent', {}, 'COMPLETED', {
+                sessionNew: false,
+                attributes: first.sessionAttributes,
+            }),
+            {},
+        );
+        expectWebcamResponse(result, 'Hamburg Südwest', 'Hamburg-SW');
     });
 
-    describe('NextIntent for Wasserkuppe Südwest', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.addEntityResolutionToRequest(
-                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Wasserkuppe Südwest' }),
-                    'webcam', LIST_OF_WEBCAMS, 'Wasserkuppe Südwest', 'Wasserkuppe-SW'),
-                says: 'Hier ist die Kamera Wasserkuppe Südwest.',
-                hasCardTitle: 'Wasserkuppe Südwest',
-                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Wasserkuppe-SW/Wasserkuppe-SW_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Wasserkuppe-SW/Wasserkuppe-SW_latest_180.jpg',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-            {
-                request: alexaTest.getIntentRequest('AMAZON.NextIntent'),
-                says: 'Hier ist die Kamera Hamburg Südost.',
-                hasCardTitle: 'Hamburg Südost',
-                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SO/Hamburg-SO_latest_180.jpg',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-        ]);
+    it('shows the next webcam for Wasserkuppe Südwest', async () => {
+        const webcam = resolvedSlot(
+            'webcam', 'Wasserkuppe Südwest', [{ name: 'Wasserkuppe Südwest', id: 'Wasserkuppe-SW' }]);
+
+        const first = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
+        expectWebcamResponse(first, 'Wasserkuppe Südwest', 'Wasserkuppe-SW');
+
+        const result = await handler(
+            intentRequest('AMAZON.NextIntent', {}, 'COMPLETED', {
+                sessionNew: false,
+                attributes: first.sessionAttributes,
+            }),
+            {},
+        );
+        expectWebcamResponse(result, 'Hamburg Südost', 'Hamburg-SO');
     });
 
-    describe('CancelIntent', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getIntentRequest('AMAZON.CancelIntent'),
-                says: '<say-as interpret-as="interjection">bis dann</say-as>.',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-        ]);
+    it('handles the cancel intent', async () => {
+        const result = await handler(intentRequest('AMAZON.CancelIntent'), {});
+
+        expect(speech(result)).to.contain(STOP_MESSAGE);
+        expect(result.response).to.not.have.property('reprompt');
+        expect(result.response.shouldEndSession).to.equal(true);
     });
 
-    describe('StopIntent', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getIntentRequest('AMAZON.StopIntent'),
-                says: '<say-as interpret-as="interjection">bis dann</say-as>.',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-        ]);
+    it('handles the stop intent', async () => {
+        const result = await handler(intentRequest('AMAZON.StopIntent'), {});
+
+        expect(speech(result)).to.contain(STOP_MESSAGE);
+        expect(result.response).to.not.have.property('reprompt');
+        expect(result.response.shouldEndSession).to.equal(true);
     });
 
-    describe('SessionEndedRequest', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getSessionEndedRequest(),
-                saysNothing: true, repromptsNothing: true, shouldEndSession: true,
-            },
-            {
-                request: alexaTest.getSessionEndedRequest('ERROR'),
-                saysNothing: true, repromptsNothing: true, shouldEndSession: true,
-            },
-        ]);
+    it('handles a session-ended request', async () => {
+        const result = await handler(sessionEndedRequest(), {});
+
+        expect(result.response).to.not.have.property('outputSpeech');
+        expect(result.response).to.not.have.property('reprompt');
+        expect(result.response.shouldEndSession).to.equal(true);
     });
 
-    describe('LaunchRequest', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.getLaunchRequest(),
-                says: 'Welche Kamera soll ich anzeigen?',
-                reprompts: 'Welche DWD-Wetterkamera soll ich anzeigen, Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde oder Wasserkuppe?',
-                shouldEndSession: false,
-            },
-        ]);
+    it('handles a session-ended request with an error', async () => {
+        const result = await handler(sessionEndedRequest('ERROR'), {});
+
+        expect(result.response).to.not.have.property('outputSpeech');
+        expect(result.response).to.not.have.property('reprompt');
+        expect(result.response.shouldEndSession).to.equal(true);
     });
 
-    describe('WeatherCamIntent', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.addEntityResolutionToRequest(
-                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Hamburg elbabwärts' }),
-                    'webcam', LIST_OF_WEBCAMS, 'Hamburg Südwest', 'Hamburg-SW'),
-                says: 'Hier ist die Kamera Hamburg Südwest.',
-                hasCardTitle: 'Hamburg Südwest',
-                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_180.jpg',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-            {
-                request: alexaTest.addEntityResolutionNoMatchToRequest(
-                    alexaTest.getIntentRequest('WeatherCamIntent'), 'webcam', LIST_OF_WEBCAMS, 'Würzburg'),
-                says: 'Ich kenne diese Kamera leider nicht.',
-                repromptsNothing: true, shouldEndSession: true,
-            },
-        ]);
+    it('handles a launch request', async () => {
+        const result = await handler(launchRequest(), {});
+
+        expect(speech(result)).to.contain('Welche Kamera soll ich anzeigen?');
+        expect(result.response.reprompt.outputSpeech.ssml).to.contain(HELP_REPROMPT);
+        expect(result.response.shouldEndSession).to.equal(false);
     });
 
-    describe('WeatherCamIntent (multiple matches)', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.addEntityResolutionsToRequest(
-                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Offenbach' }),
-                    [
-                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Offenbach Ost', id: 'Offenbach-O' },
-                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Offenbach West', id: 'Offenbach-W' },
-                    ]),
-                elicitsSlot: 'webcam',
-                says: 'Welche Kamera, Offenbach Ost oder Offenbach West?',
-                reprompts: 'Welche Kamera, Offenbach Ost oder Offenbach West?',
-                hasAttributes: {
-                    names: names => { return names[0] === 'Offenbach Ost' && names[1] === 'Offenbach West' && names.length === 2; },
-                },
-                shouldEndSession: false,
-            },
-        ]);
+    it('shows a webcam for a resolved webcam slot', async () => {
+        const webcam = resolvedSlot('webcam', 'Hamburg elbabwärts', [{ name: 'Hamburg Südwest', id: 'Hamburg-SW' }]);
+
+        const result = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
+
+        expectWebcamResponse(result, 'Hamburg Südwest', 'Hamburg-SW');
     });
 
-    describe('WeatherCamIntent (matching previous value)', () => {
-        alexaTest.test([
-            {
-                request: alexaTest.addEntityResolutionsToRequest(
-                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Hamburg' }),
-                    [
-                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Hamburg Südost', id: 'Hamburg-SO' },
-                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Hamburg Südwest', id: 'Hamburg-SW' },
-                    ]),
-                elicitsSlot: 'webcam',
-                says: 'Welche Kamera, Hamburg Südost oder Hamburg Südwest?',
-                reprompts: 'Welche Kamera, Hamburg Südost oder Hamburg Südwest?',
-                hasAttributes: {
-                    names: names => { return names[0] === 'Hamburg Südost' && names[1] === 'Hamburg Südwest' && names.length === 2; },
-                },
-                shouldEndSession: false,
-            },
-            {
-                request: alexaTest.addEntityResolutionsToRequest(
-                    alexaTest.getIntentRequest('WeatherCamIntent', { webcam: 'Südwest' }),
-                    [
-                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Hamburg Südwest', id: 'Hamburg-SW' },
-                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Schmücke Südwest', id: 'Schmuecke-SW' },
-                        { slotName: 'webcam', slotType: LIST_OF_WEBCAMS, value: 'Hohenpeißenberg Südwest', id: 'Hohenpeissenberg-SW' },
-                    ]),
-                says: 'Hier ist die Kamera Hamburg Südwest.',
-                hasCardTitle: 'Hamburg Südwest',
-                hasCardTextLike: 'Quelle: Deutscher Wetterdienst',
-                hasSmallImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_114.jpg',
-                hasLargeImageUrlLike: 'https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_180.jpg',
-                repromptsNothing: true, shouldEndSession: true,
-            },
+    it('reports an unknown webcam', async () => {
+        const webcam = resolvedSlot('webcam', 'Würzburg', [], 'ER_SUCCESS_NO_MATCH');
+
+        const result = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
+
+        expect(speech(result)).to.contain('Ich kenne diese Kamera leider nicht.');
+        expect(result.response).to.not.have.property('reprompt');
+        expect(result.response.shouldEndSession).to.equal(true);
+    });
+
+    it('elicits a webcam when Alexa resolves multiple matches', async () => {
+        const webcam = resolvedSlot('webcam', 'Offenbach', [
+            { name: 'Offenbach Ost', id: 'Offenbach-O' },
+            { name: 'Offenbach West', id: 'Offenbach-W' },
         ]);
+
+        const result = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
+
+        expect(speech(result)).to.contain('Welche Kamera, Offenbach Ost oder Offenbach West?');
+        expect(result.response.reprompt.outputSpeech.ssml)
+            .to.contain('Welche Kamera, Offenbach Ost oder Offenbach West?');
+        expect(result.response.directives[0]).to.include({ type: 'Dialog.ElicitSlot', slotToElicit: 'webcam' });
+        expect(result.sessionAttributes.names, 'names').to.deep.equal(['Offenbach Ost', 'Offenbach West']);
+        expect(result.response.shouldEndSession).to.equal(false);
+    });
+
+    it('uses the webcam matching a previous answer option', async () => {
+        const hamburg = resolvedSlot('webcam', 'Hamburg', [
+            { name: 'Hamburg Südost', id: 'Hamburg-SO' },
+            { name: 'Hamburg Südwest', id: 'Hamburg-SW' },
+        ]);
+
+        const first = await handler(intentRequest('WeatherCamIntent', { webcam: hamburg }), {});
+        expect(speech(first)).to.contain('Welche Kamera, Hamburg Südost oder Hamburg Südwest?');
+        expect(first.response.directives[0]).to.include({ type: 'Dialog.ElicitSlot', slotToElicit: 'webcam' });
+        expect(first.sessionAttributes.names, 'names').to.deep.equal(['Hamburg Südost', 'Hamburg Südwest']);
+        expect(first.response.shouldEndSession).to.equal(false);
+
+        const suedwest = resolvedSlot('webcam', 'Südwest', [
+            { name: 'Hamburg Südwest', id: 'Hamburg-SW' },
+            { name: 'Schmücke Südwest', id: 'Schmuecke-SW' },
+            { name: 'Hohenpeißenberg Südwest', id: 'Hohenpeissenberg-SW' },
+        ]);
+
+        const result = await handler(
+            intentRequest('WeatherCamIntent', { webcam: suedwest }, 'COMPLETED', {
+                sessionNew: false,
+                attributes: first.sessionAttributes,
+            }),
+            {},
+        );
+        expectWebcamResponse(result, 'Hamburg Südwest', 'Hamburg-SW');
     });
 });

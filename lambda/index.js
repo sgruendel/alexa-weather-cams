@@ -1,9 +1,9 @@
-'use strict';
+import Alexa from 'ask-sdk-core';
+import i18next from 'i18next';
+import sprintf from 'i18next-sprintf-postprocessor';
+import winston from 'winston';
 
-const Alexa = require('ask-sdk-core');
-const i18next = require('i18next');
-const sprintf = require('i18next-sprintf-postprocessor');
-const winston = require('winston');
+import { SKILL_ID } from './config.js';
 
 const logger = winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
@@ -15,9 +15,8 @@ const logger = winston.createLogger({
     exitOnError: false,
 });
 
-const model = require('./de-DE');
+import model from '../skill-package/interactionModels/custom/de-DE.json' with { type: 'json' };
 
-const SKILL_ID = 'amzn1.ask.skill.6896cced-41a6-4134-912d-c74db2be8559';
 const ER_SUCCESS_MATCH = 'ER_SUCCESS_MATCH';
 const ER_SUCCESS_NO_MATCH = 'ER_SUCCESS_NO_MATCH';
 const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
@@ -67,6 +66,7 @@ function getResponseFor(handlerInput, value) {
     return handlerInput.responseBuilder
         .speak('Hier ist die Kamera ' + value.name + '.')
         .withStandardCard(value.name, COPYRIGHT, baseUrl + '114.jpg', baseUrl + '180.jpg')
+        .withShouldEndSession(true)
         .getResponse();
 }
 
@@ -108,6 +108,7 @@ const WeatherCamIntentHandler = {
             logger.error('no match for webcam ' + slots.webcam.value);
             return handlerInput.responseBuilder
                 .speak(requestAttributes.t('UNKNOWN_WEBCAM'))
+                .withShouldEndSession(true)
                 .getResponse();
 
         case ER_SUCCESS_MATCH:
@@ -293,6 +294,7 @@ const CancelAndStopIntentHandler = {
         const speechOutput = requestAttributes.t('STOP_MESSAGE');
         return handlerInput.responseBuilder
             .speak(speechOutput)
+            .withShouldEndSession(true)
             .getResponse();
     },
 };
@@ -312,7 +314,7 @@ const SessionEndedRequestHandler = {
         }
 
         logger.debug('session ended', request);
-        return handlerInput.responseBuilder.getResponse();
+        return handlerInput.responseBuilder.withShouldEndSession(true).getResponse();
     },
 };
 
@@ -342,16 +344,24 @@ const LocalizationInterceptor = {
     },
 };
 
-exports.handler = Alexa.SkillBuilders.custom()
-    .addRequestHandlers(
-        WeatherCamIntentHandler,
-        FallbackIntentHandler,
-        HelpIntentHandler,
-        PreviousIntentHandler,
-        NextIntentHandler,
-        CancelAndStopIntentHandler,
-        SessionEndedRequestHandler)
-    .addRequestInterceptors(LocalizationInterceptor)
-    .addErrorHandlers(ErrorHandler)
-    .withSkillId(SKILL_ID)
-    .lambda();
+let skill;
+
+export const handler = async function (event, context) {
+    if (!skill) {
+        skill = Alexa.SkillBuilders.custom()
+            .addRequestHandlers(
+                WeatherCamIntentHandler,
+                FallbackIntentHandler,
+                HelpIntentHandler,
+                PreviousIntentHandler,
+                NextIntentHandler,
+                CancelAndStopIntentHandler,
+                SessionEndedRequestHandler)
+            .addRequestInterceptors(LocalizationInterceptor)
+            .addErrorHandlers(ErrorHandler)
+            .withSkillId(SKILL_ID)
+            .create();
+    }
+
+    return skill.invoke(event, context);
+};

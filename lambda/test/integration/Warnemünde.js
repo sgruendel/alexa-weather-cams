@@ -1,12 +1,10 @@
-'use strict';
+import { execFile } from 'child_process';
+import { expect } from 'chai';
 
-const { execFile } = require('child_process');
-const expect = require('chai').expect;
+import * as ask from '../ask.js';
 
-const ask = require('../ask');
-
-function verifyResponse(error, stdout) {
-    const result = ask.verifyResult(error, stdout);
+function verifyResponse(error, stdout, stderr) {
+    const result = ask.verifyResult(error, stderr);
     const { alexaResponses } = result.alexaExecutionInfo;
     expect(alexaResponses.length, 'one response').to.equal(1);
     expect(alexaResponses[0].type, 'speech response').to.equal('Speech');
@@ -15,25 +13,25 @@ function verifyResponse(error, stdout) {
 
 describe('Wetterkamera Warnemünde', () => {
     it('should find webcam for Warnemünde', (done) => {
-        const args = ask.execArgs.concat(['Alexa frage Wetterkamera nach Warnemünde']);
+        const args = ask.execArgs.concat(['test/integration/warnemünde.json']);
         execFile(ask.execFile, args, (error, stdout, stderr) => {
-            verifyResponse(error, stdout);
+            verifyResponse(error, stdout, stderr);
             done();
         });
     });
 
     it('should find webcam for Rostock', (done) => {
-        const args = ask.execArgs.concat(['Alexa frage Wetterkamera nach Rostock']);
+        const args = ask.execArgs.concat(['test/integration/rostock.json']);
         execFile(ask.execFile, args, (error, stdout, stderr) => {
-            verifyResponse(error, stdout);
+            verifyResponse(error, stdout, stderr);
             done();
         });
     });
 
     it('should find webcam for Rostock Warnemünde', (done) => {
-        const args = ask.execArgs.concat(['Alexa frage Wetterkamera nach Rostock Warnemünde']);
+        const args = ask.execArgs.concat(['test/integration/rostock_warnemünde.json']);
         execFile(ask.execFile, args, (error, stdout, stderr) => {
-            verifyResponse(error, stdout);
+            verifyResponse(error, stdout, stderr);
             done();
         });
     });

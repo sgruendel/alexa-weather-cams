@@ -1,31 +1,32 @@
-'use strict';
+import { execFile } from 'child_process';
+import { expect } from 'chai';
 
-const { execFile } = require('child_process');
-const expect = require('chai').expect;
+import * as ask from '../ask.js';
 
-const ask = require('../ask');
-
-function verifyResponse(error, stdout, outputSpeech) {
-    const result = ask.verifyResult(error, stdout);
+function verifyResponse(error, stdout, stderr, expectFn) {
+    const result = ask.verifyResult(error, stderr);
     const { alexaResponses } = result.alexaExecutionInfo;
     expect(alexaResponses.length, 'one response').to.equal(1);
     expect(alexaResponses[0].type, 'speech response').to.equal('Speech');
-    expect(alexaResponses[0].content.caption, 'output speech').to.equal(outputSpeech);
+    expectFn(alexaResponses[0].content.caption, 'output speech');
 }
 
 describe('Wetterkamera Hohenpeißenberg', () => {
     it('should find webcams for Hohenpeißenberg', (done) => {
-        const args = ask.execArgs.concat(['Alexa frage Wetterkamera nach Hohenpeißenberg']);
+        const args = ask.execArgs.concat(['test/integration/hohenpeißenberg.json']);
         execFile(ask.execFile, args, (error, stdout, stderr) => {
-            verifyResponse(error, stdout, 'Welche Kamera, Hohenpeißenberg Süd oder Hohenpeißenberg Südwest?');
+            verifyResponse(error, stdout, stderr,
+                (val, msg) => expect(val, msg)
+                    .to.eq('Welche Kamera, Hohenpeißenberg Süd oder Hohenpeißenberg Südwest?'));
             done();
         });
     });
 
     it('should find webcam for Hohenpeißenberg Südwest', (done) => {
-        const args = ask.execArgs.concat(['Alexa frage Wetterkamera nach Hohenpeißenberg Südwest']);
+        const args = ask.execArgs.concat(['test/integration/hohenpeißenberg_südwest.json']);
         execFile(ask.execFile, args, (error, stdout, stderr) => {
-            verifyResponse(error, stdout, 'Hier ist die Kamera Hohenpeißenberg Südwest.');
+            verifyResponse(error, stdout, stderr,
+                (val, msg) => expect(val, msg).to.eq('Hier ist die Kamera Hohenpeißenberg Südwest.'));
             done();
         });
     });

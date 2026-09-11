@@ -1,12 +1,10 @@
-'use strict';
+import { execFile } from 'child_process';
+import { expect } from 'chai';
 
-const { execFile } = require('child_process');
-const expect = require('chai').expect;
+import * as ask from '../ask.js';
 
-const ask = require('../ask');
-
-function verifyResponse(error, stdout) {
-    const result = ask.verifyResult(error, stdout);
+function verifyResponse(error, stdout, stderr) {
+    const result = ask.verifyResult(error, stderr);
     const { alexaResponses } = result.alexaExecutionInfo;
     expect(alexaResponses.length, 'one response').to.equal(1);
     expect(alexaResponses[0].type, 'speech response').to.equal('Speech');
@@ -15,9 +13,9 @@ function verifyResponse(error, stdout) {
 
 describe('Wetterkamera Schmücke', () => {
     it('should find webcam', (done) => {
-        const args = ask.execArgs.concat(['Alexa frage Wetterkamera nach Schmücke']);
+        const args = ask.execArgs.concat(['test/integration/schmücke.json']);
         execFile(ask.execFile, args, (error, stdout, stderr) => {
-            verifyResponse(error, stdout);
+            verifyResponse(error, stdout, stderr);
             done();
         });
     });

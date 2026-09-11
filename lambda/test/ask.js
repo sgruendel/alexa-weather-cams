@@ -1,14 +1,21 @@
-'use strict';
+import { fileURLToPath } from 'node:url';
 
-const expect = require('chai').expect;
+import { expect } from 'chai';
 
-var exports = module.exports = {};
-
-exports.execFile = 'ask';
+export const execFile = process.execPath;
 // see https://github.com/alexa/ask-cli/issues/173
-exports.execArgs = [ 'dialog', '-s', 'amzn1.ask.skill.6896cced-41a6-4134-912d-c74db2be8559', '-l', 'de-DE', '-g', 'development', '--debug', '-r' ];
+export const execArgs = [
+    fileURLToPath(new URL('./run-dialog.js', import.meta.url)),
+    '-l',
+    'de-DE',
+    '-g',
+    'development',
+    '--save-skill-io',
+    'output.json',
+    '-r',
+];
 
-exports.verifyResult = (error, output) => {
+export function verifyResult(error, output) {
     expect(error).to.be.null;
     const lastBody = output.lastIndexOf('Response body: "');
     if (lastBody < 0) {

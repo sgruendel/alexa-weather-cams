@@ -1,9 +1,7 @@
-'use strict';
+import { execFile } from 'child_process';
+import { expect } from 'chai';
 
-const { execFile } = require('child_process');
-const expect = require('chai').expect;
-
-const ask = require('../ask');
+import * as ask from '../ask.js';
 
 function verifyResponse(error, stdout, stderr, expectFn) {
     const result = ask.verifyResult(error, stderr);
@@ -18,7 +16,7 @@ function verifyResponse(error, stdout, stderr, expectFn) {
 
 describe('Wetterkamera Wasserkuppe', () => {
     it('should find webcam', (done) => {
-        const args = ask.execArgs.concat([ 'test/integration/wasserkuppe.json' ]);
+        const args = ask.execArgs.concat(['test/integration/wasserkuppe.json']);
         execFile(ask.execFile, args, (error, stdout, stderr) => {
             verifyResponse(error, stdout, stderr,
                 (val, msg) => expect(val, msg).to.eq('Hier ist die Kamera Wasserkuppe Südwest.'));

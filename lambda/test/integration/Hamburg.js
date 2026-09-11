@@ -1,9 +1,7 @@
-'use strict';
+import { execFile } from 'child_process';
+import { expect } from 'chai';
 
-const { execFile } = require('child_process');
-const expect = require('chai').expect;
-
-const ask = require('../ask');
+import * as ask from '../ask.js';
 
 function verifyResponse(error, stdout, stderr, expectFn) {
     const result = ask.verifyResult(error, stderr);
@@ -18,7 +16,7 @@ function verifyResponse(error, stdout, stderr, expectFn) {
 
 describe('Wetterkamera Hamburg', () => {
     it('should find webcams for Hamburg', (done) => {
-        const args = ask.execArgs.concat([ 'test/integration/hamburg.json' ]);
+        const args = ask.execArgs.concat(['test/integration/hamburg.json']);
         execFile(ask.execFile, args, (error, stdout, stderr) => {
             verifyResponse(error, stdout, stderr,
                 (val, msg) => expect(val, msg).to.eq('Welche Kamera, Hamburg Südost oder Hamburg Südwest?'));
@@ -27,7 +25,7 @@ describe('Wetterkamera Hamburg', () => {
     });
 
     it('should find webcam for Hamburg elbaufwärts', (done) => {
-        const args = ask.execArgs.concat([ 'test/integration/hamburg_elbaufwärts.json' ]);
+        const args = ask.execArgs.concat(['test/integration/hamburg_elbaufwärts.json']);
         execFile(ask.execFile, args, (error, stdout, stderr) => {
             verifyResponse(error, stdout, stderr,
                 (val, msg) => expect(val, msg).to.eq('Hier ist die Kamera Hamburg Südost.'));
@@ -36,7 +34,7 @@ describe('Wetterkamera Hamburg', () => {
     });
 
     it('should find webcam for Hamburg elbabwärts', (done) => {
-        const args = ask.execArgs.concat([ 'test/integration/hamburg_elbabwärts.json' ]);
+        const args = ask.execArgs.concat(['test/integration/hamburg_elbabwärts.json']);
         execFile(ask.execFile, args, (error, stdout, stderr) => {
             verifyResponse(error, stdout, stderr,
                 (val, msg) => expect(val, msg).to.eq('Hier ist die Kamera Hamburg Südwest.'));
