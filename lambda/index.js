@@ -148,10 +148,12 @@ const WeatherCamIntentHandler = {
                     }
                 }
 
-                const exactMatch = findExactMatch(rpa.values.map(v => v.value), slots.webcam.value);
-                if (exactMatch) {
-                    logger.info('found exact match for ' + slots.webcam.value, exactMatch);
-                    return getResponseFor(handlerInput, exactMatch);
+                if (!sessionAttributes.names) {
+                    const exactMatch = findExactMatch(rpa.values.map(v => v.value), slots.webcam.value);
+                    if (exactMatch) {
+                        logger.info('found exact match for ' + slots.webcam.value, exactMatch);
+                        return getResponseFor(handlerInput, exactMatch);
+                    }
                 }
 
                 logger.info('multiple matches for ' + slots.webcam.value);
