@@ -16,7 +16,7 @@ const logger = winston.createLogger({
 });
 
 import { resolveCamera, adjacentCamera } from './cameras.js';
-const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
+import { presentCamera as getResponseFor } from './presentation.js';
 
 const languageStrings = {
     de: {
@@ -35,39 +35,6 @@ i18next.use(sprintf).init({
     resources: languageStrings,
     returnObjects: true,
 });
-
-function getResponseFor(handlerInput, value) {
-    const baseUrl = 'https://opendata.dwd.de/weather/webcam/' + value.id + '/' + value.id + '_latest_';
-    if (Alexa.getSupportedInterfaces(handlerInput.requestEnvelope).Display) {
-        const webcamImage = new Alexa.ImageHelper()
-            .withDescription(COPYRIGHT)
-            .addImageInstance(baseUrl + '400.jpg', 'X_SMALL', 400, 225)
-            .addImageInstance(baseUrl + '640.jpg', 'SMALL', 640, 360)
-            .addImageInstance(baseUrl + '816.jpg', 'MEDIUM', 816, 459)
-            // .addImageInstance(baseUrl + '1200.jpg', 'LARGE', 1200, 675)
-            // .addImageInstance(baseUrl + '1920.jpg', 'X_LARGE', 1920, 1080)
-            .getImage();
-        handlerInput.responseBuilder
-            .addRenderTemplateDirective({
-                type: 'BodyTemplate7',
-                backButton: 'HIDDEN',
-                image: webcamImage,
-                title: value.name,
-            });
-    }
-
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    sessionAttributes.value = value;
-    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-
-    if (!Alexa.getSupportedInterfaces(handlerInput.requestEnvelope).Display) {
-        handlerInput.responseBuilder.withShouldEndSession(true);
-    }
-    return handlerInput.responseBuilder
-        .speak('Hier ist die Kamera ' + value.name + '.')
-        .withStandardCard(value.name, COPYRIGHT, baseUrl + '114.jpg', baseUrl + '180.jpg')
-        .getResponse();
-}
 
 const WeatherCamIntentHandler = {
     canHandle(handlerInput) {

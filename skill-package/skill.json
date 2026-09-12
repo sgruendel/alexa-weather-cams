@@ -36,6 +36,43 @@
           {
             "minimumTemplateVersion": "1.0",
             "type": "RENDER_TEMPLATE"
+          },
+          {
+            "type": "ALEXA_PRESENTATION_APL",
+            "supportedViewports": [
+              {
+                "mode": "HUB",
+                "shape": "ROUND",
+                "minWidth": 100,
+                "maxWidth": 599,
+                "minHeight": 100,
+                "maxHeight": 599
+              },
+              {
+                "mode": "HUB",
+                "shape": "RECTANGLE",
+                "minWidth": 960,
+                "maxWidth": 1279,
+                "minHeight": 600,
+                "maxHeight": 959
+              },
+              {
+                "mode": "HUB",
+                "shape": "RECTANGLE",
+                "minWidth": 1280,
+                "maxWidth": 1920,
+                "minHeight": 600,
+                "maxHeight": 1279
+              },
+              {
+                "mode": "HUB",
+                "shape": "RECTANGLE",
+                "minWidth": 480,
+                "maxWidth": 959,
+                "minHeight": 480,
+                "maxHeight": 959
+              }
+            ]
           }
         ]
       }
