@@ -67,10 +67,10 @@
               {
                 "mode": "HUB",
                 "shape": "RECTANGLE",
-                "minWidth": 480,
-                "maxWidth": 959,
-                "minHeight": 480,
-                "maxHeight": 959
+                "minWidth": 960,
+                "maxWidth": 1279,
+                "minHeight": 100,
+                "maxHeight": 599
               }
             ]
           }
