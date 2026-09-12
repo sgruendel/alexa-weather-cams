@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import * as ask from '../ask.js';
 
 function verifyResponse(error, stdout, stderr, expectFn) {
-    const result = ask.verifyResult(error, stderr);
+    const result = ask.verifyResult(error);
     const { alexaResponses } = result.alexaExecutionInfo;
     expect(alexaResponses.length, 'one response').to.equal(1);
     expect(alexaResponses[0].type, 'speech response').to.equal('Speech');

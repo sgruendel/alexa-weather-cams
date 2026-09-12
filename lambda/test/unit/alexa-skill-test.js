@@ -211,6 +211,28 @@ describe('Wetterkamera Skill', () => {
         expect(result.response.shouldEndSession).to.equal(false);
     });
 
+    it('prefers an exact name match when Alexa resolves multiple fuzzy matches', async () => {
+        const webcam = resolvedSlot('webcam', 'Offenbach Ost', [
+            { name: 'Offenbach Ost', id: 'Offenbach-O' },
+            { name: 'Offenbach West', id: 'Offenbach-W' },
+        ]);
+
+        const result = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
+
+        expectWebcamResponse(result, 'Offenbach Ost', 'Offenbach-O');
+    });
+
+    it('prefers an exact synonym match when Alexa resolves multiple fuzzy matches', async () => {
+        const webcam = resolvedSlot('webcam', 'Hamburg elbabwärts', [
+            { name: 'Hamburg Südwest', id: 'Hamburg-SW' },
+            { name: 'Hamburg Südost', id: 'Hamburg-SO' },
+        ]);
+
+        const result = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
+
+        expectWebcamResponse(result, 'Hamburg Südwest', 'Hamburg-SW');
+    });
+
     it('uses the webcam matching a previous answer option', async () => {
         const hamburg = resolvedSlot('webcam', 'Hamburg', [
             { name: 'Hamburg Südost', id: 'Hamburg-SO' },

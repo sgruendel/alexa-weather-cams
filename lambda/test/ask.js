@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { expect } from 'chai';
@@ -15,14 +16,12 @@ export const execArgs = [
     '-r',
 ];
 
-export function verifyResult(error, output) {
+export function verifyResult(error, skillIoFile = 'output.json') {
     expect(error).to.be.null;
-    const lastBody = output.lastIndexOf('Response body: "');
-    if (lastBody < 0) {
-        console.error('response body not found', output);
-        expect(lastBody).to.be.greaterThan(0);
-    }
-    const { result } = JSON.parse(JSON.parse(output.substr(output.indexOf('"', lastBody))));
+    const { invocations } = JSON.parse(readFileSync(skillIoFile, 'utf8'));
+    const { body } = invocations[invocations.length - 1].response;
+    expect(body.status, 'simulation status').to.equal('SUCCESSFUL');
+    const { result } = body;
     if (result.error) {
         console.error('error message in json', result.error);
         expect(result.error, result.error.message).to.be.null;

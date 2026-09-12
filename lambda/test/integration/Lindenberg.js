@@ -3,8 +3,8 @@ import { expect } from 'chai';
 
 import * as ask from '../ask.js';
 
-function verifyResponse(error, stdout, stderr) {
-    const result = ask.verifyResult(error, stderr);
+function verifyResponse(error) {
+    const result = ask.verifyResult(error);
     const { alexaResponses } = result.alexaExecutionInfo;
     expect(alexaResponses.length, 'one response').to.equal(1);
     expect(alexaResponses[0].type, 'speech response').to.equal('Speech');
@@ -15,8 +15,8 @@ function verifyResponse(error, stdout, stderr) {
 describe('Wetterkamera Lindenberg', () => {
     it('should find webcam', (done) => {
         const args = ask.execArgs.concat(['test/integration/lindenberg.json']);
-        execFile(ask.execFile, args, (error, stdout, stderr) => {
-            verifyResponse(error, stdout, stderr);
+        execFile(ask.execFile, args, (error) => {
+            verifyResponse(error);
             done();
         });
     });
