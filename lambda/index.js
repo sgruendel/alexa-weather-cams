@@ -15,9 +15,7 @@ const logger = winston.createLogger({
     exitOnError: false,
 });
 
-import model from './de-DE.json' with { type: 'json' };
-
-import { resolveCamera } from './cameras.js';
+import { resolveCamera, adjacentCamera } from './cameras.js';
 const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
 
 const languageStrings = {
@@ -62,10 +60,12 @@ function getResponseFor(handlerInput, value) {
     sessionAttributes.value = value;
     handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
 
+    if (!Alexa.getSupportedInterfaces(handlerInput.requestEnvelope).Display) {
+        handlerInput.responseBuilder.withShouldEndSession(true);
+    }
     return handlerInput.responseBuilder
         .speak('Hier ist die Kamera ' + value.name + '.')
         .withStandardCard(value.name, COPYRIGHT, baseUrl + '114.jpg', baseUrl + '180.jpg')
-        .withShouldEndSession(true)
         .getResponse();
 }
 
@@ -149,85 +149,17 @@ const HelpIntentHandler = {
     },
 };
 
-const PreviousIntentHandler = {
+const NavigationIntentHandler = {
     canHandle(handlerInput) {
         const { request } = handlerInput.requestEnvelope;
-        return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.PreviousIntent';
+        return request.type === 'IntentRequest'
+            && ['AMAZON.PreviousIntent', 'AMAZON.NextIntent'].includes(request.intent.name);
     },
     handle(handlerInput) {
-        const { request } = handlerInput.requestEnvelope;
-        logger.debug('request', request);
-
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        if (sessionAttributes.value) {
-            logger.debug('last webcam', sessionAttributes.value);
-            const foundIndex = model.interactionModel.languageModel.types[0].values.findIndex(value => {
-                return value.id === sessionAttributes.value.id;
-            });
-            if (foundIndex > 0) {
-                const previousValue = model.interactionModel.languageModel.types[0].values[foundIndex - 1];
-                logger.info('found previous webcam', previousValue);
-                return getResponseFor(handlerInput, { id: previousValue.id, name: previousValue.name.value });
-            } else if (foundIndex === 0) {
-                const noOfWebcams = model.interactionModel.languageModel.types[0].values.length;
-                const lastValue = model.interactionModel.languageModel.types[0].values[noOfWebcams - 1];
-                logger.info('wrapping around to last webcam', lastValue);
-                return getResponseFor(handlerInput, { id: lastValue.id, name: lastValue.name.value });
-            } else {
-                // should never happen
-                logger.error('no match for last webcam', sessionAttributes.value);
-                // just reuse the value
-                return getResponseFor(handlerInput, sessionAttributes.value);
-            }
-        }
-
-        // no webcam was shown previously, so just respond with help message
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        return handlerInput.responseBuilder
-            .speak(requestAttributes.t('HELP_MESSAGE'))
-            .reprompt(requestAttributes.t('HELP_REPROMPT'))
-            .getResponse();
-    },
-};
-
-const NextIntentHandler = {
-    canHandle(handlerInput) {
-        const { request } = handlerInput.requestEnvelope;
-        return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.NextIntent';
-    },
-    handle(handlerInput) {
-        const { request } = handlerInput.requestEnvelope;
-        logger.debug('request', request);
-
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        if (sessionAttributes.value) {
-            logger.debug('last webcam', sessionAttributes.value);
-            const foundIndex = model.interactionModel.languageModel.types[0].values.findIndex(value => {
-                return value.id === sessionAttributes.value.id;
-            });
-            const noOfWebcams = model.interactionModel.languageModel.types[0].values.length;
-            if (foundIndex === noOfWebcams - 1) {
-                const firstValue = model.interactionModel.languageModel.types[0].values[0];
-                logger.info('wrapping around to first webcam', firstValue);
-                return getResponseFor(handlerInput, { id: firstValue.id, name: firstValue.name.value });
-            } else if (foundIndex >= 0) {
-                const nextValue = model.interactionModel.languageModel.types[0].values[foundIndex + 1];
-                logger.info('found next webcam', nextValue);
-                return getResponseFor(handlerInput, { id: nextValue.id, name: nextValue.name.value });
-            } else {
-                // should never happen
-                logger.error('no match for last webcam', sessionAttributes.value);
-                // just reuse the value
-                return getResponseFor(handlerInput, sessionAttributes.value);
-            }
-        }
-
-        // no webcam was shown previously, so just respond with help message
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        return handlerInput.responseBuilder
-            .speak(requestAttributes.t('HELP_MESSAGE'))
-            .reprompt(requestAttributes.t('HELP_REPROMPT'))
-            .getResponse();
+        const current = handlerInput.attributesManager.getSessionAttributes().value;
+        const direction = handlerInput.requestEnvelope.request.intent.name === 'AMAZON.NextIntent' ? 1 : -1;
+        const camera = adjacentCamera(current?.id, direction);
+        return camera ? getResponseFor(handlerInput, camera) : HelpIntentHandler.handle(handlerInput);
     },
 };
 
@@ -304,8 +236,7 @@ export const handler = async function (event, context) {
                 WeatherCamIntentHandler,
                 FallbackIntentHandler,
                 HelpIntentHandler,
-                PreviousIntentHandler,
-                NextIntentHandler,
+                NavigationIntentHandler,
                 CancelAndStopIntentHandler,
                 SessionEndedRequestHandler)
             .addRequestInterceptors(LocalizationInterceptor)

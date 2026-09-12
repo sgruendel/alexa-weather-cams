@@ -38,3 +38,9 @@ export function resolveCamera(slot, pendingChoices = [], catalog = cameras) {
         ? { kind: 'selected', camera: choice(candidates[0]) }
         : { kind: 'ambiguous', choices: candidates.map(choice) };
 }
+
+export function adjacentCamera(id, direction) {
+    const index = cameras.findIndex(camera => camera.id === id);
+    if (index < 0) return undefined;
+    return choice(cameras[(index + direction + cameras.length) % cameras.length]);
+}

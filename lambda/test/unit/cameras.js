@@ -51,3 +51,12 @@ describe('camera resolution', () => {
         expect(input).to.deep.equal(before);
     });
 });
+
+describe('navigation decisions', () => {
+    it('wraps in both directions and rejects unknown current cameras', async () => {
+        const { adjacentCamera } = await import('../../cameras.js');
+        expect(adjacentCamera(cameras[0].id, -1).id).to.equal(cameras.at(-1).id);
+        expect(adjacentCamera(cameras.at(-1).id, 1).id).to.equal(cameras[0].id);
+        expect(adjacentCamera('unknown', 1)).to.equal(undefined);
+    });
+});
