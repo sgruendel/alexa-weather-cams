@@ -1,32 +1,14 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-
 import { SKILL_ID } from '../config.js';
+import { runDialog } from './helpers/dialog.js';
 
-const askArgs = process.argv.slice(2);
-const replayOptionIndex = askArgs.findIndex(arg => arg === '--replay' || arg === '-r');
-const replayFile = askArgs[replayOptionIndex + 1];
+const args = process.argv.slice(2);
+const replayIndex = args.findIndex(arg => arg === '--replay' || arg === '-r');
+const replayFile = args[replayIndex + 1];
+if (replayIndex < 0 || !replayFile) throw new Error('An ASK CLI replay file is required.');
 
-if (replayOptionIndex < 0 || !replayFile) {
-    throw new Error('An ASK CLI replay file is required.');
-}
-
-const replay = JSON.parse(readFileSync(replayFile, 'utf8'));
-const tempDirectory = mkdtempSync(path.join(tmpdir(), 'alexa-weather-cams-'));
-const tempReplayFile = path.join(tempDirectory, 'replay.json');
-
-try {
-    replay.skillId = SKILL_ID;
-    writeFileSync(tempReplayFile, JSON.stringify(replay), 'utf8');
-    askArgs[replayOptionIndex + 1] = tempReplayFile;
-
-    const result = spawnSync('ask', ['dialog', ...askArgs], { stdio: 'inherit' });
-    if (result.error) {
-        throw result.error;
-    }
-    process.exitCode = result.status ?? 1;
-} finally {
-    rmSync(tempDirectory, { recursive: true, force: true });
-}
+runDialog(replayFile, { skillId: SKILL_ID }).then(turns => {
+    process.stdout.write(`${JSON.stringify({ turns })}\n`);
+}).catch(error => {
+    console.error(error);
+    process.exitCode = 1;
+});

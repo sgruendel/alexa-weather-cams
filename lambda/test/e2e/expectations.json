@@ -1,0 +1,162 @@
+{
+  "berlin.json": [
+    {
+      "speechIncludes": "Dort gibt es leider keine DWD-Wetterkamera.",
+      "intent": "AMAZON.FallbackIntent",
+      "endSession": false
+    }
+  ],
+  "hamburg.json": [
+    {
+      "speech": "Welche Kamera, Hamburg Südost oder Hamburg Südwest?",
+      "intent": "WeatherCamIntent",
+      "elicit": "webcam"
+    }
+  ],
+  "hamburg_elbabwärts.json": [
+    {
+      "speech": "Hier ist die Kamera Hamburg Südwest.",
+      "intent": "WeatherCamIntent",
+      "camera": "Hamburg Südwest"
+    }
+  ],
+  "hamburg_elbaufwärts.json": [
+    {
+      "speech": "Hier ist die Kamera Hamburg Südost.",
+      "intent": "WeatherCamIntent",
+      "camera": "Hamburg Südost"
+    }
+  ],
+  "hohenpeißenberg.json": [
+    {
+      "speech": "Hier ist die Kamera Hohenpeißenberg Süd.",
+      "intent": "WeatherCamIntent",
+      "camera": "Hohenpeißenberg Süd"
+    }
+  ],
+  "lindenberg.json": [
+    {
+      "speech": "Hier ist die Kamera Lindenberg Nordnordost.",
+      "intent": "WeatherCamIntent",
+      "camera": "Lindenberg Nordnordost"
+    }
+  ],
+  "offenbach.json": [
+    {
+      "speech": "Welche Kamera, Offenbach Ost oder Offenbach West?",
+      "intent": "WeatherCamIntent",
+      "elicit": "webcam"
+    }
+  ],
+  "offenbach_ost.json": [
+    {
+      "speech": "Hier ist die Kamera Offenbach Ost.",
+      "intent": "WeatherCamIntent",
+      "camera": "Offenbach Ost"
+    }
+  ],
+  "offenbach_west.json": [
+    {
+      "speech": "Hier ist die Kamera Offenbach West.",
+      "intent": "WeatherCamIntent",
+      "camera": "Offenbach West"
+    }
+  ],
+  "rostock.json": [
+    {
+      "speech": "Hier ist die Kamera Warnemünde Nordwest.",
+      "intent": "WeatherCamIntent",
+      "camera": "Warnemünde Nordwest"
+    }
+  ],
+  "rostock_warnemünde.json": [
+    {
+      "speech": "Hier ist die Kamera Warnemünde Nordwest.",
+      "intent": "WeatherCamIntent",
+      "camera": "Warnemünde Nordwest"
+    }
+  ],
+  "schmücke.json": [
+    {
+      "speech": "Hier ist die Kamera Schmücke Südwest.",
+      "intent": "WeatherCamIntent",
+      "camera": "Schmücke Südwest"
+    }
+  ],
+  "warnemünde.json": [
+    {
+      "speech": "Hier ist die Kamera Warnemünde Nordwest.",
+      "intent": "WeatherCamIntent",
+      "camera": "Warnemünde Nordwest"
+    }
+  ],
+  "wasserkuppe.json": [
+    {
+      "speech": "Hier ist die Kamera Wasserkuppe Südwest.",
+      "intent": "WeatherCamIntent",
+      "camera": "Wasserkuppe Südwest"
+    }
+  ],
+  "hamburg_suedwest.json": [
+    {
+      "speech": "Welche Kamera, Hamburg Südost oder Hamburg Südwest?",
+      "intent": "WeatherCamIntent",
+      "elicit": "webcam"
+    },
+    {
+      "speech": "Hier ist die Kamera Hamburg Südwest.",
+      "intent": "WeatherCamIntent",
+      "camera": "Hamburg Südwest",
+      "continueSession": true
+    }
+  ],
+  "hamburg_richtung.json": [
+    {
+      "speech": "Welche Kamera, Hamburg Südost oder Hamburg Südwest?",
+      "intent": "WeatherCamIntent",
+      "elicit": "webcam"
+    },
+    {
+      "speech": "Hier ist die Kamera Hamburg Südwest.",
+      "intent": "WeatherCamIntent",
+      "camera": "Hamburg Südwest",
+      "continueSession": true
+    }
+  ],
+  "navigation.json": [
+    {
+      "camera": "Hamburg Südost",
+      "intent": "WeatherCamIntent",
+      "screen": true
+    },
+    {
+      "camera": "Hamburg Südwest",
+      "intent": "AMAZON.NextIntent",
+      "continueSession": true,
+      "screen": true
+    },
+    {
+      "camera": "Hamburg Südost",
+      "intent": "AMAZON.PreviousIntent",
+      "continueSession": true,
+      "screen": true
+    },
+    {
+      "intent": "AMAZON.StopIntent",
+      "endSession": true,
+      "continueSession": true
+    }
+  ],
+  "help.json": [
+    {
+      "speech": "Welche Kamera soll ich anzeigen?",
+      "endSession": false
+    },
+    {
+      "speechIncludes": "Ich kann dir die Bilder",
+      "intent": "AMAZON.HelpIntent",
+      "endSession": false,
+      "continueSession": true
+    }
+  ]
+}
