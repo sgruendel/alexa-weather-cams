@@ -17,8 +17,7 @@ const logger = winston.createLogger({
 
 import model from './de-DE.json' with { type: 'json' };
 
-const ER_SUCCESS_MATCH = 'ER_SUCCESS_MATCH';
-const ER_SUCCESS_NO_MATCH = 'ER_SUCCESS_NO_MATCH';
+import { resolveCamera } from './cameras.js';
 const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
 
 const languageStrings = {
@@ -38,19 +37,6 @@ i18next.use(sprintf).init({
     resources: languageStrings,
     returnObjects: true,
 });
-
-// entity resolution may return multiple fuzzy matches for a specific utterance,
-// so prefer a value whose name or synonym exactly matches the spoken slot value
-function findExactMatch(values, spokenValue) {
-    const normalized = spokenValue.toLowerCase();
-    return values.find(value => {
-        const modelValue = model.interactionModel.languageModel.types[0].values.find(v => {
-            return v.id === value.id;
-        });
-        return modelValue && (modelValue.name.value.toLowerCase() === normalized
-            || (modelValue.name.synonyms || []).some(synonym => synonym.toLowerCase() === normalized));
-    });
-}
 
 function getResponseFor(handlerInput, value) {
     const baseUrl = 'https://opendata.dwd.de/weather/webcam/' + value.id + '/' + value.id + '_latest_';
@@ -93,101 +79,39 @@ const WeatherCamIntentHandler = {
         const { request } = handlerInput.requestEnvelope;
         logger.debug('request', request);
 
-        const slots = request.intent && request.intent.slots;
-        if (slots && slots.webcam && slots.webcam.value) {
-            // slot is already filled, no need to let Alexa collect it via dialog management
-            logger.debug('setting dialog state from ' + request.dialogState + ' to COMPLETED');
-            request.dialogState = 'COMPLETED';
-        }
-
-        // delegate to Alexa to collect all the required slots
-        if (request.dialogState && request.dialogState !== 'COMPLETED') {
-            logger.debug('dialog state is ' + request.dialogState + ' => adding delegate directive');
-            return handlerInput.responseBuilder
-                .addDelegateDirective()
-                .getResponse();
-        }
-
+        const slot = request.intent?.slots?.webcam;
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        const rpa = slots
-            && slots.webcam
-            && slots.webcam.resolutions
-            && slots.webcam.resolutions.resolutionsPerAuthority[0];
-        if (!rpa) {
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        if (request.type === 'LaunchRequest') {
             return handlerInput.responseBuilder
                 .speak('Welche Kamera soll ich anzeigen?')
                 .reprompt(requestAttributes.t('HELP_REPROMPT'))
                 .getResponse();
         }
-        logger.debug('webcam slot', slots.webcam);
-
-        switch (rpa.status.code) {
-        case ER_SUCCESS_NO_MATCH:
-            // should never happen, as we only accept Slot type’s values and synonyms
-            logger.error('no match for webcam ' + slots.webcam.value);
+        const resolution = resolveCamera(slot, sessionAttributes.pendingChoices);
+        if (resolution.kind === 'no-match') {
             return handlerInput.responseBuilder
                 .speak(requestAttributes.t('UNKNOWN_WEBCAM'))
                 .withShouldEndSession(true)
                 .getResponse();
-
-        case ER_SUCCESS_MATCH:
-            if (rpa.values.length > 1) {
-                const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-                if (sessionAttributes.names) {
-                    logger.debug('previous names', sessionAttributes.names);
-                    const foundValue = rpa.values.find(value => {
-                        return sessionAttributes.names.find(name => {
-                            return name === value.value.name;
-                        });
-                    });
-                    if (foundValue) {
-                        logger.info('found matching previous answer option', foundValue);
-                        sessionAttributes.names = undefined;
-                        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-                        return getResponseFor(handlerInput, foundValue.value);
-                    }
-                }
-
-                if (!sessionAttributes.names) {
-                    const exactMatch = findExactMatch(rpa.values.map(v => v.value), slots.webcam.value);
-                    if (exactMatch) {
-                        logger.info('found exact match for ' + slots.webcam.value, exactMatch);
-                        return getResponseFor(handlerInput, exactMatch);
-                    }
-                }
-
-                logger.info('multiple matches for ' + slots.webcam.value);
-                let prompt = 'Welche Kamera';
-                const size = rpa.values.length;
-
-                let names = [];
-                rpa.values.forEach((element, index) => {
-                    prompt += ((index === size - 1) ? ' oder ' : ', ') + element.value.name;
-                    names.push(element.value.name);
-                });
-
-                prompt += '?';
-                logger.info('eliciting webcam slot: ' + prompt);
-
-                sessionAttributes.names = names;
-                handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-
-                return handlerInput.responseBuilder
-                    .speak(prompt)
-                    .reprompt(prompt)
-                    .addElicitSlotDirective(slots.webcam.name)
-                    .getResponse();
-            }
-            break;
-
-        default:
-            logger.error('unexpected status code ' + rpa.status.code);
         }
-
-        const value = rpa.values[0].value;
-        logger.info('webcam value', value);
-
-        return getResponseFor(handlerInput, value);
+        if (resolution.kind === 'selected') {
+            delete sessionAttributes.pendingChoices;
+            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+            return getResponseFor(handlerInput, resolution.camera);
+        }
+        let prompt = 'Welche Kamera soll ich anzeigen?';
+        if (resolution.kind === 'ambiguous') {
+            const names = resolution.choices.map(camera => camera.name);
+            prompt = 'Welche Kamera, ' + names.slice(0, -1).join(', ') + ' oder ' + names.at(-1) + '?';
+            sessionAttributes.pendingChoices = resolution.choices.map(camera => camera.id);
+            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        }
+        return handlerInput.responseBuilder
+            .speak(prompt)
+            .reprompt(prompt)
+            .addElicitSlotDirective('webcam')
+            .getResponse();
     },
 };
 

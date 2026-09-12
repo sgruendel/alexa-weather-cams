@@ -207,7 +207,7 @@ describe('Wetterkamera Skill', () => {
         expect(result.response.reprompt.outputSpeech.ssml)
             .to.contain('Welche Kamera, Offenbach Ost oder Offenbach West?');
         expect(result.response.directives[0]).to.include({ type: 'Dialog.ElicitSlot', slotToElicit: 'webcam' });
-        expect(result.sessionAttributes.names, 'names').to.deep.equal(['Offenbach Ost', 'Offenbach West']);
+        expect(result.sessionAttributes.pendingChoices, 'names').to.deep.equal(['Offenbach-O', 'Offenbach-W']);
         expect(result.response.shouldEndSession).to.equal(false);
     });
 
@@ -242,7 +242,7 @@ describe('Wetterkamera Skill', () => {
         const first = await handler(intentRequest('WeatherCamIntent', { webcam: hamburg }), {});
         expect(speech(first)).to.contain('Welche Kamera, Hamburg Südost oder Hamburg Südwest?');
         expect(first.response.directives[0]).to.include({ type: 'Dialog.ElicitSlot', slotToElicit: 'webcam' });
-        expect(first.sessionAttributes.names, 'names').to.deep.equal(['Hamburg Südost', 'Hamburg Südwest']);
+        expect(first.sessionAttributes.pendingChoices, 'names').to.deep.equal(['Hamburg-SO', 'Hamburg-SW']);
         expect(first.response.shouldEndSession).to.equal(false);
 
         const suedwest = resolvedSlot('webcam', 'Südwest', [
@@ -261,14 +261,14 @@ describe('Wetterkamera Skill', () => {
         expectWebcamResponse(result, 'Hamburg Südwest', 'Hamburg-SW');
     });
 
-    it('re-elicits when a follow-up answer does not match a previous answer option', async () => {
+    it('prefers an exact follow-up even outside previous choices', async () => {
         const hamburg = resolvedSlot('webcam', 'Hamburg', [
             { name: 'Hamburg Südost', id: 'Hamburg-SO' },
             { name: 'Hamburg Südwest', id: 'Hamburg-SW' },
         ]);
 
         const first = await handler(intentRequest('WeatherCamIntent', { webcam: hamburg }), {});
-        expect(first.sessionAttributes.names, 'names').to.deep.equal(['Hamburg Südost', 'Hamburg Südwest']);
+        expect(first.sessionAttributes.pendingChoices, 'names').to.deep.equal(['Hamburg-SO', 'Hamburg-SW']);
 
         // user answers the elicitation with an exact match that was not offered
         const offenbach = resolvedSlot('webcam', 'Offenbach Ost', [
@@ -283,8 +283,6 @@ describe('Wetterkamera Skill', () => {
             }),
             {},
         );
-        expect(speech(result)).to.contain('Welche Kamera, Offenbach Ost oder Offenbach West?');
-        expect(result.response.directives[0]).to.include({ type: 'Dialog.ElicitSlot', slotToElicit: 'webcam' });
-        expect(result.response.shouldEndSession).to.equal(false);
+        expectWebcamResponse(result, 'Offenbach Ost', 'Offenbach-O');
     });
 });
