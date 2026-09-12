@@ -9,6 +9,8 @@
     "test:unit": "node --env-file-if-exists=.env ./node_modules/c8/bin/c8.js --reporter=lcov --reporter=text mocha --timeout=7000 --file test/setup.js test/unit/*",
     "test:integration": "node --env-file-if-exists=.env ./node_modules/mocha/bin/mocha.js --timeout=20000 test/integration/*",
     "test": "npm run test:unit",
+    "lambda:zip": "rm -f /tmp/weatherCams.zip && zip -r /tmp/weatherCams.zip node_modules/ package* *.js *.json -x output.json",
+    "lambda:deploy": "npm run lambda:zip && aws lambda update-function-code --function-name weatherCams --zip-file fileb:///tmp/weatherCams.zip",
     "model:deploy": "node --env-file-if-exists=.env scripts/deploy-model.js"
   },
   "repository": {

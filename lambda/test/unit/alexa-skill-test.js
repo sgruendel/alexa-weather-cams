@@ -211,6 +211,28 @@ describe('Wetterkamera Skill', () => {
         expect(result.response.shouldEndSession).to.equal(false);
     });
 
+    it('prefers an exact name match when Alexa resolves multiple fuzzy matches', async () => {
+        const webcam = resolvedSlot('webcam', 'Offenbach Ost', [
+            { name: 'Offenbach Ost', id: 'Offenbach-O' },
+            { name: 'Offenbach West', id: 'Offenbach-W' },
+        ]);
+
+        const result = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
+
+        expectWebcamResponse(result, 'Offenbach Ost', 'Offenbach-O');
+    });
+
+    it('prefers an exact synonym match when Alexa resolves multiple fuzzy matches', async () => {
+        const webcam = resolvedSlot('webcam', 'Hamburg elbabwärts', [
+            { name: 'Hamburg Südwest', id: 'Hamburg-SW' },
+            { name: 'Hamburg Südost', id: 'Hamburg-SO' },
+        ]);
+
+        const result = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
+
+        expectWebcamResponse(result, 'Hamburg Südwest', 'Hamburg-SW');
+    });
+
     it('uses the webcam matching a previous answer option', async () => {
         const hamburg = resolvedSlot('webcam', 'Hamburg', [
             { name: 'Hamburg Südost', id: 'Hamburg-SO' },
@@ -237,5 +259,32 @@ describe('Wetterkamera Skill', () => {
             {},
         );
         expectWebcamResponse(result, 'Hamburg Südwest', 'Hamburg-SW');
+    });
+
+    it('re-elicits when a follow-up answer does not match a previous answer option', async () => {
+        const hamburg = resolvedSlot('webcam', 'Hamburg', [
+            { name: 'Hamburg Südost', id: 'Hamburg-SO' },
+            { name: 'Hamburg Südwest', id: 'Hamburg-SW' },
+        ]);
+
+        const first = await handler(intentRequest('WeatherCamIntent', { webcam: hamburg }), {});
+        expect(first.sessionAttributes.names, 'names').to.deep.equal(['Hamburg Südost', 'Hamburg Südwest']);
+
+        // user answers the elicitation with an exact match that was not offered
+        const offenbach = resolvedSlot('webcam', 'Offenbach Ost', [
+            { name: 'Offenbach Ost', id: 'Offenbach-O' },
+            { name: 'Offenbach West', id: 'Offenbach-W' },
+        ]);
+
+        const result = await handler(
+            intentRequest('WeatherCamIntent', { webcam: offenbach }, 'COMPLETED', {
+                sessionNew: false,
+                attributes: first.sessionAttributes,
+            }),
+            {},
+        );
+        expect(speech(result)).to.contain('Welche Kamera, Offenbach Ost oder Offenbach West?');
+        expect(result.response.directives[0]).to.include({ type: 'Dialog.ElicitSlot', slotToElicit: 'webcam' });
+        expect(result.response.shouldEndSession).to.equal(false);
     });
 });

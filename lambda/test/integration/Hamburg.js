@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import * as ask from '../ask.js';
 
 function verifyResponse(error, stdout, stderr, expectFn) {
-    const result = ask.verifyResult(error, stderr);
+    const result = ask.verifyResult(error);
     // console.log('alexa responses', result.alexaExecutionInfo.alexaResponses);
     // console.log('considered intents', result.alexaExecutionInfo.consideredIntents);
     // console.log('invocations', result.skillExecutionInfo.invocations);

@@ -15,7 +15,7 @@ const logger = winston.createLogger({
     exitOnError: false,
 });
 
-import model from '../skill-package/interactionModels/custom/de-DE.json' with { type: 'json' };
+import model from './de-DE.json' with { type: 'json' };
 
 const ER_SUCCESS_MATCH = 'ER_SUCCESS_MATCH';
 const ER_SUCCESS_NO_MATCH = 'ER_SUCCESS_NO_MATCH';
@@ -38,6 +38,19 @@ i18next.use(sprintf).init({
     resources: languageStrings,
     returnObjects: true,
 });
+
+// entity resolution may return multiple fuzzy matches for a specific utterance,
+// so prefer a value whose name or synonym exactly matches the spoken slot value
+function findExactMatch(values, spokenValue) {
+    const normalized = spokenValue.toLowerCase();
+    return values.find(value => {
+        const modelValue = model.interactionModel.languageModel.types[0].values.find(v => {
+            return v.id === value.id;
+        });
+        return modelValue && (modelValue.name.value.toLowerCase() === normalized
+            || (modelValue.name.synonyms || []).some(synonym => synonym.toLowerCase() === normalized));
+    });
+}
 
 function getResponseFor(handlerInput, value) {
     const baseUrl = 'https://opendata.dwd.de/weather/webcam/' + value.id + '/' + value.id + '_latest_';
@@ -80,6 +93,13 @@ const WeatherCamIntentHandler = {
         const { request } = handlerInput.requestEnvelope;
         logger.debug('request', request);
 
+        const slots = request.intent && request.intent.slots;
+        if (slots && slots.webcam && slots.webcam.value) {
+            // slot is already filled, no need to let Alexa collect it via dialog management
+            logger.debug('setting dialog state from ' + request.dialogState + ' to COMPLETED');
+            request.dialogState = 'COMPLETED';
+        }
+
         // delegate to Alexa to collect all the required slots
         if (request.dialogState && request.dialogState !== 'COMPLETED') {
             logger.debug('dialog state is ' + request.dialogState + ' => adding delegate directive');
@@ -89,7 +109,6 @@ const WeatherCamIntentHandler = {
         }
 
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        const slots = request.intent && request.intent.slots;
         const rpa = slots
             && slots.webcam
             && slots.webcam.resolutions
@@ -126,6 +145,14 @@ const WeatherCamIntentHandler = {
                         sessionAttributes.names = undefined;
                         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
                         return getResponseFor(handlerInput, foundValue.value);
+                    }
+                }
+
+                if (!sessionAttributes.names) {
+                    const exactMatch = findExactMatch(rpa.values.map(v => v.value), slots.webcam.value);
+                    if (exactMatch) {
+                        logger.info('found exact match for ' + slots.webcam.value, exactMatch);
+                        return getResponseFor(handlerInput, exactMatch);
                     }
                 }
 
