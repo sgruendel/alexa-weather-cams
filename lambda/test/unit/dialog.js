@@ -167,4 +167,43 @@ describe('dialog runner', () => {
         expect(() => parseDialogOutput(output(failed, { ...successfulTurn(), id: 'one' }), 1)).to.throw('bad');
     });
 
+    it('does not retry an arbitrary skill failure following a transient failure', async () => {
+        let attempts = 0;
+        const run = fakeRun(output(
+            { status: 'FAILED', result: { error: { message: 'An unexpected error occurred.' } } },
+            { status: 'FAILED', result: { error: { message: 'Invalid directive' } } },
+        ));
+        const error = await rejection(runDialog(replayFile, { skillId: 'test-skill', run: (...args) => { attempts++; return run(...args); } }));
+        expect(error.message).to.contain('Invalid directive');
+        expect(attempts).to.equal(1);
+    });
+    it('validates camera, help, fallback and navigation expectations and rejects ended sessions', () => {
+        const makeTurn = (intent, response, session, caption = 'OK') => {
+            const turn = successfulTurn(caption);
+            const invocation = turn.result.skillExecutionInfo.invocations[0];
+            invocation.invocationRequest.body = { request: { type: 'IntentRequest', intent: { name: intent } }, session };
+            invocation.invocationResponse.body.response = response;
+            return turn;
+        };
+        const cameraResponse = { card: { title: 'Hamburg Südwest' }, directives: [{ type: 'Alexa.Presentation.APL.RenderDocument' }] };
+        const first = makeTurn('WeatherCamIntent', cameraResponse, { sessionId: 'same', new: true });
+        const next = makeTurn('AMAZON.NextIntent', cameraResponse, { sessionId: 'same', new: false });
+        const expectations = [
+            { camera: 'Hamburg Südwest', intent: 'WeatherCamIntent', screen: true },
+            { camera: 'Hamburg Südwest', intent: 'AMAZON.NextIntent', screen: true, continueSession: true },
+        ];
+        verifyTurns([first, next], expectations);
+        for (const intent of ['AMAZON.HelpIntent', 'AMAZON.FallbackIntent']) {
+            verifyTurns([makeTurn(intent, { shouldEndSession: false }, {}, 'Help')], [{ intent, speechIncludes: 'Help', endSession: false }]);
+        }
+        const ended = structuredClone(first);
+        ended.result.skillExecutionInfo.invocations[0].invocationResponse.body.response.shouldEndSession = true;
+        expect(() => verifyTurns([ended, next], [{ camera: 'Hamburg Südwest' }, expectations[1]])).to.throw('preceding session stays open');
+        const wrongSession = structuredClone(next);
+        wrongSession.result.skillExecutionInfo.invocations[0].invocationRequest.body.session.sessionId = 'different';
+        expect(() => verifyTurns([first, wrongSession], expectations)).to.throw();
+        expect(() => verifyTurns([first], [{ camera: 'Offenbach Ost' }])).to.throw();
+        expect(() => verifyTurns([first], [{ intent: 'AMAZON.HelpIntent' }])).to.throw();
+    });
+
 });

@@ -64,3 +64,26 @@ describe('screen presentation and session continuity', () => {
         }
     });
 });
+
+describe('ambiguous camera follow-up regression', () => {
+    for (const spoken of ['Hamburg Südwest', 'Hamburg', 'Südwest']) {
+        it(`handles Hamburg followed by ${spoken} in the same session`, async () => {
+            const matches = [{ id: 'Hamburg-SO' }, { id: 'Hamburg-SW' }];
+            const firstRequest = intentRequest('WeatherCamIntent', { webcam: resolvedSlot('webcam', 'Hamburg', matches) });
+            const first = await handler(firstRequest, {});
+            expect(first.sessionAttributes.pendingChoices).to.deep.equal(['Hamburg-SO', 'Hamburg-SW']);
+            const candidates = spoken === 'Südwest' ? [{ id: 'Schmuecke-SW' }, { id: 'Hamburg-SW' }] : matches;
+            const request = intentRequest('WeatherCamIntent', { webcam: resolvedSlot('webcam', spoken, candidates) }, 'COMPLETED', continueSession(firstRequest, first));
+            const before = structuredClone(request);
+            const result = await handler(request, {});
+            expect(request).to.deep.equal(before);
+            if (spoken === 'Hamburg') {
+                expect(result.response.directives[0].type).to.equal('Dialog.ElicitSlot');
+                expect(result.sessionAttributes.pendingChoices).to.have.length(2);
+            } else {
+                expect(result.sessionAttributes.value.id).to.equal('Hamburg-SW');
+                expect(result.sessionAttributes).not.to.have.property('pendingChoices');
+            }
+        });
+    }
+});

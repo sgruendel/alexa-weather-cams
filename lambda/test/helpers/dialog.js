@@ -19,12 +19,18 @@ export class SimulationError extends Error {
 export function parseDialogOutput(output, expectedTurns) {
     if (!output || !Array.isArray(output.invocations)) throw new SimulationError('Malformed simulation output');
     const completed = new Map();
+    let transientError;
     for (const invocation of output.invocations) {
         const body = invocation.response?.body;
         if (!body || body.status === 'IN_PROGRESS') continue;
         // Validate before deduplicating: a later poll must never conceal an error.
         const error = body.result?.error;
-        if (error) throw new SimulationError(`Turn ${completed.size + 1}: ${error.message}`, error.message === 'An unexpected error occurred.');
+        if (error) {
+            const failure = new SimulationError(`Turn ${completed.size + 1}: ${error.message}`, error.message === 'An unexpected error occurred.');
+            if (!failure.retryable) throw failure;
+            transientError = failure;
+            continue;
+        }
         if (body.status !== 'SUCCESSFUL') throw new SimulationError(`Turn ${completed.size + 1}: simulation status ${body.status}`);
         const speech = body.result?.alexaExecutionInfo?.alexaResponses;
         if (!Array.isArray(speech) || !speech.some(response => response.type === 'Speech' && typeof response.content?.caption === 'string')) {
@@ -32,6 +38,7 @@ export function parseDialogOutput(output, expectedTurns) {
         }
         completed.set(body.id ?? Symbol(), body);
     }
+    if (transientError) throw transientError;
     const turns = [...completed.values()];
     if (turns.length !== expectedTurns) {
         throw new SimulationError(`Expected ${expectedTurns} completed turns, received ${turns.length}`, true);
