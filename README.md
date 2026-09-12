@@ -41,7 +41,8 @@ manifest's APL interface and supported viewports. Then run `npm run test:e2e`. E
 temporary input/output files, validates every completed turn, and allows at most two attempts for
 incomplete simulation output or the known transient “An unexpected error occurred.” response.
 Subprocesses are killed after 35 seconds per attempt, within an 80-second total budget and 90-second
-Mocha timeout. Assertion failures, other skill errors, and CLI failures are not retried.
+Mocha timeout. A nonzero ASK exit is retried only when its saved output confirms that known transient
+simulation error. Assertion failures, other skill errors, timeouts, and unrelated CLI failures are not retried.
 
 The navigation replay requires a simulation that exposes a screen interface. It verifies that Alexa
 keeps the same session open; a voice-only simulation cannot validate screen browsing and will fail

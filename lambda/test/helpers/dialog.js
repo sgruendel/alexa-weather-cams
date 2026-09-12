@@ -8,10 +8,11 @@ import { setTimeout as delay } from 'node:timers/promises';
 const execute = promisify(execFile);
 
 export class SimulationError extends Error {
-    constructor(message, retryable = false) {
+    constructor(message, retryReason) {
         super(message);
         this.name = 'SimulationError';
-        this.retryable = retryable;
+        this.retryReason = retryReason;
+        this.retryable = Boolean(retryReason);
     }
 }
 
@@ -26,7 +27,7 @@ export function parseDialogOutput(output, expectedTurns) {
         // Validate before deduplicating: a later poll must never conceal an error.
         const error = body.result?.error;
         if (error) {
-            const failure = new SimulationError(`Turn ${completed.size + 1}: ${error.message}`, error.message === 'An unexpected error occurred.');
+            const failure = new SimulationError(`Turn ${completed.size + 1}: ${error.message}`, error.message === 'An unexpected error occurred.' ? 'transient' : undefined);
             if (!failure.retryable) throw failure;
             transientError = failure;
             continue;
@@ -41,7 +42,7 @@ export function parseDialogOutput(output, expectedTurns) {
     if (transientError) throw transientError;
     const turns = [...completed.values()];
     if (turns.length !== expectedTurns) {
-        throw new SimulationError(`Expected ${expectedTurns} completed turns, received ${turns.length}`, true);
+        throw new SimulationError(`Expected ${expectedTurns} completed turns, received ${turns.length}`, 'incomplete');
     }
     return turns;
 }
@@ -74,14 +75,30 @@ export async function runDialog(replayFile, {
             const remaining = Math.floor(deadline - performance.now());
             if (remaining <= 0) throw new Error('ASK dialog deadline exceeded');
             await writeFile(outputFile, JSON.stringify({ invocations: [] }));
-            const { stdout, stderr } = await run('ask', [
-                'dialog', '--locale', replay.locale ?? 'de-DE', '--stage', 'development',
-                '--profile', profile, '--replay', inputFile, '--save-skill-io', outputFile,
-            ], { encoding: 'utf8', timeout: Math.min(attemptTimeoutMs, remaining), killSignal: 'SIGKILL', maxBuffer: 4 * 1024 * 1024 });
+            let diagnostics;
+            let processError;
             try {
-                return parseDialogOutput(JSON.parse(await readFile(outputFile, 'utf8')), expectedTurns);
+                diagnostics = await run('ask', [
+                    'dialog', '--locale', replay.locale ?? 'de-DE', '--stage', 'development',
+                    '--profile', profile, '--replay', inputFile, '--save-skill-io', outputFile,
+                ], { encoding: 'utf8', timeout: Math.min(attemptTimeoutMs, remaining), killSignal: 'SIGKILL', maxBuffer: 4 * 1024 * 1024 });
             } catch (error) {
-                // Never retry assertion failures, CLI failures, or arbitrary skill errors.
+                // A normal nonzero exit can represent a saved simulation failure.
+                // Signals, timeouts, spawn failures and output limits remain fatal.
+                if (error.killed || error.signal || !Number.isInteger(error.code) || error.code === 0) throw error;
+                processError = error;
+                diagnostics = error;
+            }
+            const { stdout, stderr } = diagnostics;
+            try {
+                const turns = parseDialogOutput(JSON.parse(await readFile(outputFile, 'utf8')), expectedTurns);
+                if (processError) throw processError;
+                return turns;
+            } catch (error) {
+                // A failed CLI invocation is retryable only when its saved output
+                // positively identifies the known transient simulation error.
+                if (processError && !(error instanceof SimulationError && error.retryReason === 'transient')) throw processError;
+                if (processError) error.cause = processError;
                 if (!(error instanceof SimulationError) || !error.retryable || attempt === maxAttempts) {
                     error.message += `\nASK diagnostics:\n${stderr ?? ''}${stdout ?? ''}`;
                     throw error;

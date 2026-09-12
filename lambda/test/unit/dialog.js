@@ -206,4 +206,66 @@ describe('dialog runner', () => {
         expect(() => verifyTurns([first], [{ intent: 'AMAZON.HelpIntent' }])).to.throw();
     });
 
+    for (const recover of [true, false]) {
+        it(`handles a real nonzero exit with saved transient output (recover=${recover})`, async () => {
+            let attempts = 0;
+            const run = async (command, args, options) => {
+                attempts++;
+                tempInput = args[args.indexOf('--replay') + 1];
+                if (recover && attempts === 2) return fakeRun(output(successfulTurn(), successfulTurn()))(command, args, options);
+                const outputFile = args[args.indexOf('--save-skill-io') + 1];
+                const saved = output({ status: 'FAILED', result: { error: { message: 'An unexpected error occurred.' } } });
+                return promisify(execFile)(process.execPath, ['--input-type=module', '-e', `
+                    import { writeFileSync } from 'node:fs';
+                    writeFileSync(process.argv[1], process.argv[2]);
+                    writeFileSync(2, 'ASK simulation failed');
+                    process.exitCode = 1;
+                `, outputFile, JSON.stringify(saved)], options);
+            };
+            const result = runDialog(replayFile, { skillId: 'test-skill', retryDelayMs: 1, run });
+            if (recover) {
+                expect(await result).to.have.length(2);
+            } else {
+                const error = await rejection(result);
+                expect(error.message).to.contain('An unexpected error occurred.').and.to.contain('ASK simulation failed');
+                expect(error.cause.code).to.equal(1);
+            }
+            expect(attempts).to.equal(2);
+        });
+    }
+    for (const [name, saved, failure] of [
+        ['incomplete output', output(), { code: 1 }],
+        ['successful output', output(successfulTurn(), successfulTurn()), { code: 1 }],
+        ['malformed output', '{', { code: 1 }],
+        ['missing output', undefined, { code: 1 }],
+        ['other skill error', output({ status: 'FAILED', result: { error: { message: 'Invalid directive' } } }), { code: 1 }],
+        ['mixed errors', output(
+            { status: 'FAILED', result: { error: { message: 'An unexpected error occurred.' } } },
+            { status: 'FAILED', result: { error: { message: 'Invalid directive' } } },
+        ), { code: 1 }],
+        ...[
+            { code: 1, killed: true, signal: 'SIGKILL' },
+            { code: null, signal: 'SIGTERM' },
+            { code: 'ENOENT' },
+            { code: 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER' },
+        ].map(failure => ['process failure ' + JSON.stringify(failure), output(
+            { status: 'FAILED', result: { error: { message: 'An unexpected error occurred.' } } },
+        ), failure]),
+    ]) {
+        it(`preserves the CLI failure without retrying ${name}`, async () => {
+            let attempts = 0;
+            const original = Object.assign(new Error('CLI failed'), failure, { stderr: 'CLI diagnostics' });
+            const error = await rejection(runDialog(replayFile, { skillId: 'test-skill', run: async (command, args) => {
+                attempts++;
+                tempInput = args[args.indexOf('--replay') + 1];
+                const outputFile = args[args.indexOf('--save-skill-io') + 1];
+                if (saved === undefined) await rm(outputFile);
+                else await writeFile(outputFile, typeof saved === 'string' ? saved : JSON.stringify(saved));
+                throw original;
+            } }));
+            expect(error).to.equal(original);
+            expect(attempts).to.equal(1);
+        });
+    }
+
 });
