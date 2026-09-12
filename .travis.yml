@@ -1,3 +1,10 @@
 language: node_js
 node_js:
-  - 16
+  - 24
+before_install:
+  - cd lambda
+install:
+  - npm ci
+script:
+  - npm run lint
+  - npm test

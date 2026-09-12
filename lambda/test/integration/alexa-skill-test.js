@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { handler } from '../../index.js';
-import { intentRequest, launchRequest, resolvedSlot, sessionEndedRequest } from '../helpers/alexa.js';
+import { intentRequest, launchRequest, resolvedSlot, sessionEndedRequest, continueSession } from '../helpers/alexa.js';
 
 const FALLBACK_MESSAGE = 'Dort gibt es leider keine DWD-Wetterkamera.'
     + ' Ich kann dir die Bilder von Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde'
@@ -16,7 +16,7 @@ function speech(responseEnvelope) {
     return responseEnvelope.response.outputSpeech.ssml;
 }
 
-function expectWebcamResponse(result, name, id) {
+function expectWebcamResponse(result, name, id, screen = false) {
     expect(speech(result)).to.contain(`Hier ist die Kamera ${name}.`);
     expect(result.response.card).to.include({ type: 'Standard', title: name });
     expect(result.response.card.text, 'card text').to.have.string('Quelle: Deutscher Wetterdienst');
@@ -25,7 +25,8 @@ function expectWebcamResponse(result, name, id) {
         largeImageUrl: `https://opendata.dwd.de/weather/webcam/${id}/${id}_latest_180.jpg`,
     });
     expect(result.response).to.not.have.property('reprompt');
-    expect(result.response.shouldEndSession).to.equal(true);
+    if (screen) expect(result.response).not.to.have.property('shouldEndSession');
+    else expect(result.response.shouldEndSession).to.equal(true);
 }
 
 describe('Wetterkamera Skill', () => {
@@ -66,34 +67,30 @@ describe('Wetterkamera Skill', () => {
     it('shows the previous webcam for Hamburg Südost', async () => {
         const webcam = resolvedSlot('webcam', 'Hamburg Südost', [{ name: 'Hamburg Südost', id: 'Hamburg-SO' }]);
 
-        const first = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
-        expectWebcamResponse(first, 'Hamburg Südost', 'Hamburg-SO');
+        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { Display: {} } });
+        const first = await handler(request, {});
+        expectWebcamResponse(first, 'Hamburg Südost', 'Hamburg-SO', true);
 
         const result = await handler(
-            intentRequest('AMAZON.PreviousIntent', {}, 'COMPLETED', {
-                sessionNew: false,
-                attributes: first.sessionAttributes,
-            }),
+            intentRequest('AMAZON.PreviousIntent', {}, 'COMPLETED', continueSession(request, first)),
             {},
         );
-        expectWebcamResponse(result, 'Wasserkuppe Südwest', 'Wasserkuppe-SW');
+        expectWebcamResponse(result, 'Wasserkuppe Südwest', 'Wasserkuppe-SW', true);
     });
 
     it('shows the previous webcam for Warnemünde Nordwest', async () => {
         const webcam = resolvedSlot(
             'webcam', 'Warnemünde Nordwest', [{ name: 'Warnemünde Nordwest', id: 'Warnemuende-NW' }]);
 
-        const first = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
-        expectWebcamResponse(first, 'Warnemünde Nordwest', 'Warnemuende-NW');
+        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { Display: {} } });
+        const first = await handler(request, {});
+        expectWebcamResponse(first, 'Warnemünde Nordwest', 'Warnemuende-NW', true);
 
         const result = await handler(
-            intentRequest('AMAZON.PreviousIntent', {}, 'COMPLETED', {
-                sessionNew: false,
-                attributes: first.sessionAttributes,
-            }),
+            intentRequest('AMAZON.PreviousIntent', {}, 'COMPLETED', continueSession(request, first)),
             {},
         );
-        expectWebcamResponse(result, 'Schmücke Südwest', 'Schmuecke-SW');
+        expectWebcamResponse(result, 'Schmücke Südwest', 'Schmuecke-SW', true);
     });
 
     it('shows the help message for the next intent without a webcam', async () => {
@@ -107,34 +104,30 @@ describe('Wetterkamera Skill', () => {
     it('shows the next webcam for Hamburg Südost', async () => {
         const webcam = resolvedSlot('webcam', 'Hamburg Südost', [{ name: 'Hamburg Südost', id: 'Hamburg-SO' }]);
 
-        const first = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
-        expectWebcamResponse(first, 'Hamburg Südost', 'Hamburg-SO');
+        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { Display: {} } });
+        const first = await handler(request, {});
+        expectWebcamResponse(first, 'Hamburg Südost', 'Hamburg-SO', true);
 
         const result = await handler(
-            intentRequest('AMAZON.NextIntent', {}, 'COMPLETED', {
-                sessionNew: false,
-                attributes: first.sessionAttributes,
-            }),
+            intentRequest('AMAZON.NextIntent', {}, 'COMPLETED', continueSession(request, first)),
             {},
         );
-        expectWebcamResponse(result, 'Hamburg Südwest', 'Hamburg-SW');
+        expectWebcamResponse(result, 'Hamburg Südwest', 'Hamburg-SW', true);
     });
 
     it('shows the next webcam for Wasserkuppe Südwest', async () => {
         const webcam = resolvedSlot(
             'webcam', 'Wasserkuppe Südwest', [{ name: 'Wasserkuppe Südwest', id: 'Wasserkuppe-SW' }]);
 
-        const first = await handler(intentRequest('WeatherCamIntent', { webcam }), {});
-        expectWebcamResponse(first, 'Wasserkuppe Südwest', 'Wasserkuppe-SW');
+        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { Display: {} } });
+        const first = await handler(request, {});
+        expectWebcamResponse(first, 'Wasserkuppe Südwest', 'Wasserkuppe-SW', true);
 
         const result = await handler(
-            intentRequest('AMAZON.NextIntent', {}, 'COMPLETED', {
-                sessionNew: false,
-                attributes: first.sessionAttributes,
-            }),
+            intentRequest('AMAZON.NextIntent', {}, 'COMPLETED', continueSession(request, first)),
             {},
         );
-        expectWebcamResponse(result, 'Hamburg Südost', 'Hamburg-SO');
+        expectWebcamResponse(result, 'Hamburg Südost', 'Hamburg-SO', true);
     });
 
     it('handles the cancel intent', async () => {
@@ -207,7 +200,7 @@ describe('Wetterkamera Skill', () => {
         expect(result.response.reprompt.outputSpeech.ssml)
             .to.contain('Welche Kamera, Offenbach Ost oder Offenbach West?');
         expect(result.response.directives[0]).to.include({ type: 'Dialog.ElicitSlot', slotToElicit: 'webcam' });
-        expect(result.sessionAttributes.names, 'names').to.deep.equal(['Offenbach Ost', 'Offenbach West']);
+        expect(result.sessionAttributes.pendingChoices, 'names').to.deep.equal(['Offenbach-O', 'Offenbach-W']);
         expect(result.response.shouldEndSession).to.equal(false);
     });
 
@@ -242,7 +235,7 @@ describe('Wetterkamera Skill', () => {
         const first = await handler(intentRequest('WeatherCamIntent', { webcam: hamburg }), {});
         expect(speech(first)).to.contain('Welche Kamera, Hamburg Südost oder Hamburg Südwest?');
         expect(first.response.directives[0]).to.include({ type: 'Dialog.ElicitSlot', slotToElicit: 'webcam' });
-        expect(first.sessionAttributes.names, 'names').to.deep.equal(['Hamburg Südost', 'Hamburg Südwest']);
+        expect(first.sessionAttributes.pendingChoices, 'names').to.deep.equal(['Hamburg-SO', 'Hamburg-SW']);
         expect(first.response.shouldEndSession).to.equal(false);
 
         const suedwest = resolvedSlot('webcam', 'Südwest', [
@@ -261,14 +254,14 @@ describe('Wetterkamera Skill', () => {
         expectWebcamResponse(result, 'Hamburg Südwest', 'Hamburg-SW');
     });
 
-    it('re-elicits when a follow-up answer does not match a previous answer option', async () => {
+    it('prefers an exact follow-up even outside previous choices', async () => {
         const hamburg = resolvedSlot('webcam', 'Hamburg', [
             { name: 'Hamburg Südost', id: 'Hamburg-SO' },
             { name: 'Hamburg Südwest', id: 'Hamburg-SW' },
         ]);
 
         const first = await handler(intentRequest('WeatherCamIntent', { webcam: hamburg }), {});
-        expect(first.sessionAttributes.names, 'names').to.deep.equal(['Hamburg Südost', 'Hamburg Südwest']);
+        expect(first.sessionAttributes.pendingChoices, 'names').to.deep.equal(['Hamburg-SO', 'Hamburg-SW']);
 
         // user answers the elicitation with an exact match that was not offered
         const offenbach = resolvedSlot('webcam', 'Offenbach Ost', [
@@ -283,8 +276,6 @@ describe('Wetterkamera Skill', () => {
             }),
             {},
         );
-        expect(speech(result)).to.contain('Welche Kamera, Offenbach Ost oder Offenbach West?');
-        expect(result.response.directives[0]).to.include({ type: 'Dialog.ElicitSlot', slotToElicit: 'webcam' });
-        expect(result.response.shouldEndSession).to.equal(false);
+        expectWebcamResponse(result, 'Offenbach Ost', 'Offenbach-O');
     });
 });

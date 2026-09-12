@@ -1,0 +1,11 @@
+{
+  "locale": "de-DE",
+  "type": "text",
+  "userInput": [
+    "starte Wetterkamera und frage nach Hamburg elbaufwärts",
+    "weiter",
+    "zurück",
+    "stopp",
+    ".quit"
+  ]
+}

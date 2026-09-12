@@ -2,7 +2,7 @@ import { SKILL_ID } from '../../config.js';
 
 let requestId = 0;
 
-function requestEnvelope(request, { sessionNew = true, attributes = {} } = {}) {
+function requestEnvelope(request, { sessionNew = true, attributes = {}, sessionId, supportedInterfaces = {} } = {}) {
     requestId += 1;
     const application = { applicationId: SKILL_ID };
     const user = { userId: 'amzn1.ask.account.TEST' };
@@ -11,7 +11,7 @@ function requestEnvelope(request, { sessionNew = true, attributes = {} } = {}) {
         version: '1.0',
         session: {
             new: sessionNew,
-            sessionId: `test-session-${requestId}`,
+            sessionId: sessionId ?? `test-session-${requestId}`,
             application,
             attributes,
             user,
@@ -22,7 +22,7 @@ function requestEnvelope(request, { sessionNew = true, attributes = {} } = {}) {
                 user,
                 device: {
                     deviceId: 'test-device',
-                    supportedInterfaces: {},
+                    supportedInterfaces,
                 },
                 apiEndpoint: 'https://api.amazonalexa.com',
             },
@@ -85,5 +85,16 @@ export function resolvedSlot(name, spokenValue, matches, status = 'ER_SUCCESS_MA
                 },
             ],
         },
+    };
+}
+
+/** Continue only a session Alexa has not explicitly ended. */
+export function continueSession(request, result) {
+    if (result.response.shouldEndSession === true) throw new Error('Cannot continue an ended session');
+    return {
+        sessionNew: false,
+        sessionId: request.session.sessionId,
+        attributes: result.sessionAttributes,
+        supportedInterfaces: request.context.System.device.supportedInterfaces,
     };
 }

@@ -15,11 +15,8 @@ const logger = winston.createLogger({
     exitOnError: false,
 });
 
-import model from './de-DE.json' with { type: 'json' };
-
-const ER_SUCCESS_MATCH = 'ER_SUCCESS_MATCH';
-const ER_SUCCESS_NO_MATCH = 'ER_SUCCESS_NO_MATCH';
-const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
+import { resolveCamera, adjacentCamera } from './cameras.js';
+import { presentCamera as getResponseFor } from './presentation.js';
 
 const languageStrings = {
     de: {
@@ -39,50 +36,6 @@ i18next.use(sprintf).init({
     returnObjects: true,
 });
 
-// entity resolution may return multiple fuzzy matches for a specific utterance,
-// so prefer a value whose name or synonym exactly matches the spoken slot value
-function findExactMatch(values, spokenValue) {
-    const normalized = spokenValue.toLowerCase();
-    return values.find(value => {
-        const modelValue = model.interactionModel.languageModel.types[0].values.find(v => {
-            return v.id === value.id;
-        });
-        return modelValue && (modelValue.name.value.toLowerCase() === normalized
-            || (modelValue.name.synonyms || []).some(synonym => synonym.toLowerCase() === normalized));
-    });
-}
-
-function getResponseFor(handlerInput, value) {
-    const baseUrl = 'https://opendata.dwd.de/weather/webcam/' + value.id + '/' + value.id + '_latest_';
-    if (Alexa.getSupportedInterfaces(handlerInput.requestEnvelope).Display) {
-        const webcamImage = new Alexa.ImageHelper()
-            .withDescription(COPYRIGHT)
-            .addImageInstance(baseUrl + '400.jpg', 'X_SMALL', 400, 225)
-            .addImageInstance(baseUrl + '640.jpg', 'SMALL', 640, 360)
-            .addImageInstance(baseUrl + '816.jpg', 'MEDIUM', 816, 459)
-            // .addImageInstance(baseUrl + '1200.jpg', 'LARGE', 1200, 675)
-            // .addImageInstance(baseUrl + '1920.jpg', 'X_LARGE', 1920, 1080)
-            .getImage();
-        handlerInput.responseBuilder
-            .addRenderTemplateDirective({
-                type: 'BodyTemplate7',
-                backButton: 'HIDDEN',
-                image: webcamImage,
-                title: value.name,
-            });
-    }
-
-    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-    sessionAttributes.value = value;
-    handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-
-    return handlerInput.responseBuilder
-        .speak('Hier ist die Kamera ' + value.name + '.')
-        .withStandardCard(value.name, COPYRIGHT, baseUrl + '114.jpg', baseUrl + '180.jpg')
-        .withShouldEndSession(true)
-        .getResponse();
-}
-
 const WeatherCamIntentHandler = {
     canHandle(handlerInput) {
         const { request } = handlerInput.requestEnvelope;
@@ -93,101 +46,39 @@ const WeatherCamIntentHandler = {
         const { request } = handlerInput.requestEnvelope;
         logger.debug('request', request);
 
-        const slots = request.intent && request.intent.slots;
-        if (slots && slots.webcam && slots.webcam.value) {
-            // slot is already filled, no need to let Alexa collect it via dialog management
-            logger.debug('setting dialog state from ' + request.dialogState + ' to COMPLETED');
-            request.dialogState = 'COMPLETED';
-        }
-
-        // delegate to Alexa to collect all the required slots
-        if (request.dialogState && request.dialogState !== 'COMPLETED') {
-            logger.debug('dialog state is ' + request.dialogState + ' => adding delegate directive');
-            return handlerInput.responseBuilder
-                .addDelegateDirective()
-                .getResponse();
-        }
-
+        const slot = request.intent?.slots?.webcam;
         const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        const rpa = slots
-            && slots.webcam
-            && slots.webcam.resolutions
-            && slots.webcam.resolutions.resolutionsPerAuthority[0];
-        if (!rpa) {
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        if (request.type === 'LaunchRequest') {
             return handlerInput.responseBuilder
                 .speak('Welche Kamera soll ich anzeigen?')
                 .reprompt(requestAttributes.t('HELP_REPROMPT'))
                 .getResponse();
         }
-        logger.debug('webcam slot', slots.webcam);
-
-        switch (rpa.status.code) {
-        case ER_SUCCESS_NO_MATCH:
-            // should never happen, as we only accept Slot type’s values and synonyms
-            logger.error('no match for webcam ' + slots.webcam.value);
+        const resolution = resolveCamera(slot, sessionAttributes.pendingChoices);
+        if (resolution.kind === 'no-match') {
             return handlerInput.responseBuilder
                 .speak(requestAttributes.t('UNKNOWN_WEBCAM'))
                 .withShouldEndSession(true)
                 .getResponse();
-
-        case ER_SUCCESS_MATCH:
-            if (rpa.values.length > 1) {
-                const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-                if (sessionAttributes.names) {
-                    logger.debug('previous names', sessionAttributes.names);
-                    const foundValue = rpa.values.find(value => {
-                        return sessionAttributes.names.find(name => {
-                            return name === value.value.name;
-                        });
-                    });
-                    if (foundValue) {
-                        logger.info('found matching previous answer option', foundValue);
-                        sessionAttributes.names = undefined;
-                        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-                        return getResponseFor(handlerInput, foundValue.value);
-                    }
-                }
-
-                if (!sessionAttributes.names) {
-                    const exactMatch = findExactMatch(rpa.values.map(v => v.value), slots.webcam.value);
-                    if (exactMatch) {
-                        logger.info('found exact match for ' + slots.webcam.value, exactMatch);
-                        return getResponseFor(handlerInput, exactMatch);
-                    }
-                }
-
-                logger.info('multiple matches for ' + slots.webcam.value);
-                let prompt = 'Welche Kamera';
-                const size = rpa.values.length;
-
-                let names = [];
-                rpa.values.forEach((element, index) => {
-                    prompt += ((index === size - 1) ? ' oder ' : ', ') + element.value.name;
-                    names.push(element.value.name);
-                });
-
-                prompt += '?';
-                logger.info('eliciting webcam slot: ' + prompt);
-
-                sessionAttributes.names = names;
-                handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-
-                return handlerInput.responseBuilder
-                    .speak(prompt)
-                    .reprompt(prompt)
-                    .addElicitSlotDirective(slots.webcam.name)
-                    .getResponse();
-            }
-            break;
-
-        default:
-            logger.error('unexpected status code ' + rpa.status.code);
         }
-
-        const value = rpa.values[0].value;
-        logger.info('webcam value', value);
-
-        return getResponseFor(handlerInput, value);
+        if (resolution.kind === 'selected') {
+            delete sessionAttributes.pendingChoices;
+            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+            return getResponseFor(handlerInput, resolution.camera);
+        }
+        let prompt = 'Welche Kamera soll ich anzeigen?';
+        if (resolution.kind === 'ambiguous') {
+            const names = resolution.choices.map(camera => camera.name);
+            prompt = 'Welche Kamera, ' + names.slice(0, -1).join(', ') + ' oder ' + names.at(-1) + '?';
+            sessionAttributes.pendingChoices = resolution.choices.map(camera => camera.id);
+            handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        }
+        return handlerInput.responseBuilder
+            .speak(prompt)
+            .reprompt(prompt)
+            .addElicitSlotDirective('webcam')
+            .getResponse();
     },
 };
 
@@ -225,85 +116,17 @@ const HelpIntentHandler = {
     },
 };
 
-const PreviousIntentHandler = {
+const NavigationIntentHandler = {
     canHandle(handlerInput) {
         const { request } = handlerInput.requestEnvelope;
-        return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.PreviousIntent';
+        return request.type === 'IntentRequest'
+            && ['AMAZON.PreviousIntent', 'AMAZON.NextIntent'].includes(request.intent.name);
     },
     handle(handlerInput) {
-        const { request } = handlerInput.requestEnvelope;
-        logger.debug('request', request);
-
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        if (sessionAttributes.value) {
-            logger.debug('last webcam', sessionAttributes.value);
-            const foundIndex = model.interactionModel.languageModel.types[0].values.findIndex(value => {
-                return value.id === sessionAttributes.value.id;
-            });
-            if (foundIndex > 0) {
-                const previousValue = model.interactionModel.languageModel.types[0].values[foundIndex - 1];
-                logger.info('found previous webcam', previousValue);
-                return getResponseFor(handlerInput, { id: previousValue.id, name: previousValue.name.value });
-            } else if (foundIndex === 0) {
-                const noOfWebcams = model.interactionModel.languageModel.types[0].values.length;
-                const lastValue = model.interactionModel.languageModel.types[0].values[noOfWebcams - 1];
-                logger.info('wrapping around to last webcam', lastValue);
-                return getResponseFor(handlerInput, { id: lastValue.id, name: lastValue.name.value });
-            } else {
-                // should never happen
-                logger.error('no match for last webcam', sessionAttributes.value);
-                // just reuse the value
-                return getResponseFor(handlerInput, sessionAttributes.value);
-            }
-        }
-
-        // no webcam was shown previously, so just respond with help message
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        return handlerInput.responseBuilder
-            .speak(requestAttributes.t('HELP_MESSAGE'))
-            .reprompt(requestAttributes.t('HELP_REPROMPT'))
-            .getResponse();
-    },
-};
-
-const NextIntentHandler = {
-    canHandle(handlerInput) {
-        const { request } = handlerInput.requestEnvelope;
-        return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.NextIntent';
-    },
-    handle(handlerInput) {
-        const { request } = handlerInput.requestEnvelope;
-        logger.debug('request', request);
-
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        if (sessionAttributes.value) {
-            logger.debug('last webcam', sessionAttributes.value);
-            const foundIndex = model.interactionModel.languageModel.types[0].values.findIndex(value => {
-                return value.id === sessionAttributes.value.id;
-            });
-            const noOfWebcams = model.interactionModel.languageModel.types[0].values.length;
-            if (foundIndex === noOfWebcams - 1) {
-                const firstValue = model.interactionModel.languageModel.types[0].values[0];
-                logger.info('wrapping around to first webcam', firstValue);
-                return getResponseFor(handlerInput, { id: firstValue.id, name: firstValue.name.value });
-            } else if (foundIndex >= 0) {
-                const nextValue = model.interactionModel.languageModel.types[0].values[foundIndex + 1];
-                logger.info('found next webcam', nextValue);
-                return getResponseFor(handlerInput, { id: nextValue.id, name: nextValue.name.value });
-            } else {
-                // should never happen
-                logger.error('no match for last webcam', sessionAttributes.value);
-                // just reuse the value
-                return getResponseFor(handlerInput, sessionAttributes.value);
-            }
-        }
-
-        // no webcam was shown previously, so just respond with help message
-        const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
-        return handlerInput.responseBuilder
-            .speak(requestAttributes.t('HELP_MESSAGE'))
-            .reprompt(requestAttributes.t('HELP_REPROMPT'))
-            .getResponse();
+        const current = handlerInput.attributesManager.getSessionAttributes().value;
+        const direction = handlerInput.requestEnvelope.request.intent.name === 'AMAZON.NextIntent' ? 1 : -1;
+        const camera = adjacentCamera(current?.id, direction);
+        return camera ? getResponseFor(handlerInput, camera) : HelpIntentHandler.handle(handlerInput);
     },
 };
 
@@ -380,8 +203,7 @@ export const handler = async function (event, context) {
                 WeatherCamIntentHandler,
                 FallbackIntentHandler,
                 HelpIntentHandler,
-                PreviousIntentHandler,
-                NextIntentHandler,
+                NavigationIntentHandler,
                 CancelAndStopIntentHandler,
                 SessionEndedRequestHandler)
             .addRequestInterceptors(LocalizationInterceptor)

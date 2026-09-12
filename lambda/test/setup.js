@@ -1,11 +1,7 @@
 import nock from 'nock';
 
-// override .env, which may set LOG_LEVEL=debug
-process.env.LOG_LEVEL = 'info';
-
-before(() => {
-    nock.disableNetConnect();
-});
+// Disable networking before test modules are imported as well as during tests.
+nock.disableNetConnect();
 
 afterEach(function () {
     const pendingMocks = nock.pendingMocks();
