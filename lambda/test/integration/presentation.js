@@ -26,7 +26,10 @@ describe('screen presentation and session continuity', () => {
                 expect(directives[0].document).to.include({ type: 'APL', version: '1.0' });
                 expect(directives[0].datasources.camera).to.deep.equal({ name: 'Hamburg Südwest', attribution: 'Quelle: Deutscher Wetterdienst', url: 'https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_816.jpg' });
                 const items = directives[0].document.mainTemplate.items[0].items;
-                expect(items[1]).to.include({ type: 'Image', scale: 'best-fit', source: '${camera.url}' });
+                expect(items[1]).to.include({
+                    type: 'Image', scale: 'best-fit', source: '${camera.url}',
+                    accessibilityLabel: 'Wetterkamera ${camera.name}. ${camera.attribution}.',
+                });
                 expect(items[0].text).to.equal('${camera.name}');
                 expect(items[2].text).to.equal('${camera.attribution}');
             } else {
