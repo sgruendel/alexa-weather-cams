@@ -1,16 +1,21 @@
 # alexa-weather-cams
 
+[![CI](https://github.com/sgruendel/alexa-weather-cams/actions/workflows/node.js.yaml/badge.svg?branch=master)](https://github.com/sgruendel/alexa-weather-cams/actions/workflows/node.js.yaml)
+[![Node.js 24](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](mise.toml)
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
+
 Alexa skill for DWD weather cameras. Camera names and exact synonyms come from
 `skill-package/interactionModels/custom/de-DE.json`, shared with Lambda through `lambda/de-DE.json`.
 APL devices show an image, camera name, and DWD attribution; older Display devices use the existing
 image template. Alexa app cards and voice-only responses are also supported.
 
-Use Node 24 (`mise install` or `nvm install`, then `nvm use`). Run the following commands from `lambda/`:
+Run `mise install` from the repository root to install Node 24, matching the Lambda runtime in `ask-resources.json`.
+Then run the following commands from `lambda/`:
 
 ```bash
-npm ci
-npm run lint
-npm test
+mise exec -- npm ci
+mise exec -- npm run lint
+mise exec -- npm test
 ```
 
 | Command | Purpose |
@@ -21,6 +26,9 @@ npm test
 | `npm run test:contract` | Live DWD image checks for every URL emitted in cards and screen directives |
 | `npm run test:e2e` | Dialogs against the deployed Alexa development skill |
 | `npm run lint` | ESLint |
+
+GitHub Actions uses the same `mise.toml` configuration for offline CI and live image contracts, and caches npm downloads.
+With Mise activated in your shell, you can also run the npm commands directly.
 
 Offline suites preload a dummy skill ID before imports, do not load `.env`, and disable network
 connections. Coverage includes all runtime modules and requires 90% lines, statements, and functions,
