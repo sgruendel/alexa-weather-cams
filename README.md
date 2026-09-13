@@ -52,7 +52,9 @@ still be needed to avoid interference between remote Alexa sessions.
 
 Before release, record the deployed revision and e2e results, then check a voice-only Echo and an Echo
 Show for German pronunciation, image visibility and aspect ratio, DWD attribution, next/previous
-navigation including wraparound, and stop/cancel behavior. Voice-only selection and stop/cancel
+navigation including wraparound, and stop/cancel behavior. With VoiceView enabled on the Echo Show,
+verify that the image label announces the selected camera name and DWD attribution, including after navigation.
+Voice-only selection and stop/cancel
 explicitly end the session; successful screen responses leave `shouldEndSession` unset. Record any
 unavailable external or device checks in the PR. Deployment packaging and historical-image navigation
 remain separate follow-ups.
