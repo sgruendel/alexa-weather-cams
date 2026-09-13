@@ -26,7 +26,10 @@ export function presentCamera(handlerInput, camera) {
                         paddingBottom: '8vh',
                         items: [
                             { type: 'Text', text: '${camera.name}', fontSize: '5vh', textAlign: 'center', maxLines: 1 },
-                            { type: 'Image', source: '${camera.url}', width: '100%', height: '60vh', scale: 'best-fit' },
+                            {
+                                type: 'Image', source: '${camera.url}', width: '100%', height: '60vh', scale: 'best-fit',
+                                accessibilityLabel: 'Wetterkamera ${camera.name}. ${camera.attribution}.',
+                            },
                             { type: 'Text', text: '${camera.attribution}', fontSize: '3vh', textAlign: 'center', maxLines: 1 },
                         ],
                     }],
