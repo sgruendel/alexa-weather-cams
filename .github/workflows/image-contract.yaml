@@ -17,10 +17,12 @@ jobs:
         working-directory: lambda
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: jdx/mise-action@v4
+      - uses: actions/cache@v6
         with:
-          node-version: '24'
-          cache: npm
-          cache-dependency-path: lambda/package-lock.json
-      - run: npm ci
-      - run: npm run test:contract
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('lambda/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+      - run: mise exec -- npm ci
+      - run: mise exec -- npm run test:contract
