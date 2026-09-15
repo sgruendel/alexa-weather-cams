@@ -42,7 +42,9 @@ enable the development skill for the same account in the Alexa app when testing 
 Deployed tests validate the code, interaction model, and manifest already deployed to Alexa, not an
 undeployed working tree. A Lambda-only or interaction-model-only deployment does not enable APL. Deploy
 the complete project from `lambda/` with `mise exec -- npm run skill:deploy` so that Alexa receives the manifest's APL
-interface and supported viewports as well as the Lambda code. Then run `mise exec -- npm run test:e2e`. Each replay has isolated
+interface and supported viewports as well as the Lambda code. The deployment script initializes ASK CLI's
+ignored `.ask/ask-states.json` from `SKILL_ID` and rejects a conflicting existing target. Then run
+`mise exec -- npm run test:e2e`. Each replay has isolated
 temporary input/output files, validates every completed turn, and allows at most two attempts for
 incomplete simulation output or the known transient “An unexpected error occurred.” response.
 Subprocesses are killed after 35 seconds per attempt, within an 80-second total budget and 90-second
