@@ -1,6 +1,6 @@
 {
   "name": "alexa-weather-cams",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "Alexa Skill to view DWD weather webcams",
   "main": "index.js",
   "type": "module",
@@ -14,6 +14,7 @@
     "model:deploy": "node --env-file-if-exists=.env scripts/deploy-model.js",
     "test:contract": "node --import ./test/env.js ./node_modules/mocha/bin/mocha.js --timeout=15000 \"test/contract/*.js\"",
     "test:e2e": "node --env-file-if-exists=.env ./node_modules/mocha/bin/mocha.js --timeout=90000 \"test/e2e/*.js\"",
+    "skill:deploy": "node --env-file-if-exists=.env scripts/deploy-skill.js",
     "lint": "eslint ."
   },
   "repository": {

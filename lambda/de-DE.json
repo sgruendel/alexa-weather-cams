@@ -1,1 +1,299 @@
-../skill-package/interactionModels/custom/de-DE.json
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "wetterkamera",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "WeatherCamIntent",
+          "slots": [
+            {
+              "name": "webcam",
+              "type": "LIST_OF_WEBCAMS",
+              "samples": [
+                "{webcam}",
+                "für {webcam}",
+                "in {webcam}",
+                "mit {webcam}",
+                "nach {webcam}",
+                "von {webcam}",
+                "der {webcam}",
+                "auf der {webcam}"
+              ]
+            }
+          ],
+          "samples": [
+            "für {webcam}",
+            "in {webcam}",
+            "mit {webcam}",
+            "nach {webcam}",
+            "von {webcam}",
+            "der {webcam}",
+            "auf der {webcam}",
+            "am Standort {webcam}",
+            "für Standort {webcam}",
+            "für den Standort {webcam}",
+            "der Kamera {webcam}",
+            "der Kamera für {webcam}",
+            "der Kamera in {webcam}",
+            "der Kamera von {webcam}",
+            "der Kamera der {webcam}",
+            "der Kamera auf der {webcam}",
+            "zeige {webcam}",
+            "zeige mir {webcam}"
+          ]
+        },
+        {
+          "name": "AMAZON.MoreIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateSettingsIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PreviousIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollRightIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollLeftIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        }
+      ],
+      "types": [
+        {
+          "name": "LIST_OF_WEBCAMS",
+          "values": [
+            {
+              "id": "Hamburg-SO",
+              "name": {
+                "value": "Hamburg Südost",
+                "synonyms": [
+                  "Hamburg Südosten",
+                  "Hamburg elbaufwärts",
+                  "Hamburg Elbe aufwärts",
+                  "Hamburg Blick nach Südost",
+                  "Hamburg Blick nach Südosten",
+                  "Hamburg Blickrichtung Südost",
+                  "Hamburg Blickrichtung Südosten"
+                ]
+              }
+            },
+            {
+              "id": "Hamburg-SW",
+              "name": {
+                "value": "Hamburg Südwest",
+                "synonyms": [
+                  "Hamburg Südwesten",
+                  "Hamburg elbabwärts",
+                  "Hamburg Elbe abwärts",
+                  "Hamburg Blick nach Südwest",
+                  "Hamburg Blick nach Südwesten",
+                  "Hamburg Blickrichtung Südwest",
+                  "Hamburg Blickrichtung Südwesten"
+                ]
+              }
+            },
+            {
+              "id": "Hohenpeissenberg-S",
+              "name": {
+                "value": "Hohenpeißenberg Süd",
+                "synonyms": [
+                  "Hohenpeißenberg",
+                  "Hohenpeißenberg Süden",
+                  "Hohenpeißenberg Blick nach Süden",
+                  "Hohenpeißenberg Blickrichtung Süd",
+                  "Hohenpeißenberg Blickrichtung Süden"
+                ]
+              }
+            },
+            {
+              "id": "Lindenberg-NNE",
+              "name": {
+                "value": "Lindenberg Nordnordost",
+                "synonyms": [
+                  "Lindenberg",
+                  "Lindenberg Nordnordosten",
+                  "Lindenberg Blick nach Nordnordost",
+                  "Lindenberg Blick nach Nordnordosten",
+                  "Lindenberg Blickrichtung Nordnordost",
+                  "Lindenberg Blickrichtung Nordnordosten"
+                ]
+              }
+            },
+            {
+              "id": "Offenbach-O",
+              "name": {
+                "value": "Offenbach Ost",
+                "synonyms": [
+                  "Offenbach Osten",
+                  "Offenbach Blick nach Osten",
+                  "Offenbach Blick nach Offenbach",
+                  "Offenbach Blickrichtung Ost",
+                  "Offenbach Blickrichtung Osten",
+                  "Offenbach Blickrichtung Offenbach"
+                ]
+              }
+            },
+            {
+              "id": "Offenbach-W",
+              "name": {
+                "value": "Offenbach West",
+                "synonyms": [
+                  "Offenbach Westen",
+                  "Offenbach Blick nach Westen",
+                  "Offenbach Blick nach Frankfurt",
+                  "Offenbach Blickrichtung West",
+                  "Offenbach Blickrichtung Westen",
+                  "Offenbach Blickrichtung Frankfurt"
+                ]
+              }
+            },
+            {
+              "id": "Schmuecke-SW",
+              "name": {
+                "value": "Schmücke Südwest",
+                "synonyms": [
+                  "Schmücke",
+                  "Schmücke Südwesten",
+                  "Schmücke Blick nach Südwest",
+                  "Schmücke Blick nach Südwesten",
+                  "Schmücke Blick nach Suhl",
+                  "Schmücke Blickrichtung Südwest",
+                  "Schmücke Blickrichtung Südwesten",
+                  "Schmücke Blickrichtung Suhl"
+                ]
+              }
+            },
+            {
+              "id": "Warnemuende-NW",
+              "name": {
+                "value": "Warnemünde Nordwest",
+                "synonyms": [
+                  "Warnemünde",
+                  "Warnemünde Nordwesten",
+                  "Rostock Warnemünde",
+                  "Rostock Warnemünde Nordwest",
+                  "Rostock Warnemünde Nordwesten",
+                  "Warnemünde Blick nach Nordwest",
+                  "Warnemünde Blick nach Nordwesten",
+                  "Warnemünde Blickrichtung Nordwest",
+                  "Warnemünde Blickrichtung Nordwesten",
+                  "Rostock Warnemünde Blick nach Nordwest",
+                  "Rostock Warnemünde Blick nach Nordwesten",
+                  "Rostock Warnemünde Blickrichtung Nordwest",
+                  "Rostock Warnemünde Blickrichtung Nordwesten"
+                ]
+              }
+            },
+            {
+              "id": "Wasserkuppe-SW",
+              "name": {
+                "value": "Wasserkuppe Südwest",
+                "synonyms": [
+                  "Wasserkuppe",
+                  "Wasserkuppe Südwesten",
+                  "Wasserkuppe Blick nach Südwest",
+                  "Wasserkuppe Blick nach Südwesten",
+                  "Wasserkuppe Blickrichtung Südwest",
+                  "Wasserkuppe Blickrichtung Südwesten"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "WeatherCamIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "webcam",
+              "type": "LIST_OF_WEBCAMS",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.WeatherCamIntent"
+              },
+              "validations": [
+                {
+                  "type": "hasEntityResolutionMatch",
+                  "prompt": "Slot.Validation.WeatherCamIntent"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "SKILL_RESPONSE"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.WeatherCamIntent",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Welche Kamera?"
+          }
+        ]
+      },
+      {
+        "id": "Slot.Validation.WeatherCamIntent",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Es gibt leider keine Kamera für {webcam}. Welche Kamera soll ich anzeigen?"
+          }
+        ]
+      }
+    ]
+  },
+  "version": "48"
+}

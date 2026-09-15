@@ -6,22 +6,26 @@
 
 Alexa skill for DWD weather cameras. Camera names and exact synonyms come from
 `skill-package/interactionModels/custom/de-DE.json`, shared with Lambda through `lambda/de-DE.json`.
-APL devices show an image, camera name, and DWD attribution; older Display devices use the existing
-image template. Alexa app cards and voice-only responses are also supported.
+APL devices show an image, camera name, and DWD attribution. Alexa app cards and voice-only responses
+are also supported.
 
 Run `mise install` from the repository root to install Node 24, matching the Lambda runtime in `ask-resources.json`.
-Then run the following commands from `lambda/`:
+With Mise activated in your shell, run the following commands from `lambda/`:
 
 ```bash
-mise exec -- npm ci
-mise exec -- npm run lint
-mise exec -- npm test
+npm ci
+npm run lint
+npm test
 ```
 
 See [TESTING.md](TESTING.md) for individual suites, coverage, CI, deployed Alexa setup, and device checks.
 
 For deployment, copy `lambda/.env.example` to `lambda/.env` and set `SKILL_ID`.
 The deployed Lambda must provide the same environment variable. The local `.env` is ignored by Git.
+Run `npm run skill:deploy` from `lambda/` to deploy both the Lambda and skill manifest. Deploying only
+the Lambda or interaction model does not enable the APL interface that an Echo Show needs to render
+the camera image. The command initializes ASK CLI's ignored project state from `SKILL_ID` and refuses
+to deploy if an existing state file targets a different skill.
 
 The APL manifest and document follow Amazon's
 [viewport configuration](https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/apl-select-the-viewport-profiles-your-skill-supports.html)

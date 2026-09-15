@@ -3,7 +3,11 @@ import skill from '../../../skill-package/skill.json' with { type: 'json' };
 
 // Representative devices and edges of the supported HUB viewport profiles.
 describe('APL manifest viewports', () => {
-    const { supportedViewports } = skill.manifest.apis.custom.interfaces.find(entry => entry.type === 'ALEXA_PRESENTATION_APL');
+    const { interfaces } = skill.manifest.apis.custom;
+    const { supportedViewports } = interfaces.find(entry => entry.type === 'ALEXA_PRESENTATION_APL');
+    it('uses APL as its only screen interface', () => {
+        expect(interfaces.map(entry => entry.type)).to.deep.equal(['ALEXA_PRESENTATION_APL']);
+    });
     for (const [shape, width, height] of [
         ['ROUND', 480, 480],
         ['RECTANGLE', 960, 480],

@@ -19,11 +19,11 @@
           "description": "Dieser Skill funktioniert nur sinnvoll mit dem Echo Show oder Echo Spot.\n\nEs werden die aktuellen Aufnahmen der öffentlichen Wetterkameras vom DWD (Deutscher Wetterdienst) angezeigt, Aufruf über\n\"Alexa, frage Wetterkamera nach Hamburg elbabwärts\"\noder\n\"Alexa, frage Wetterkamera nach Schmücke\"\n\nDWD-Wetterkameras stehen in Hamburg, Hohenpeißenberg, Lindenberg, Offenbach, Schmücke, Warnemünde und auf der Wasserkuppe.\n\nQuelle: Deutscher Wetterdienst\n\nVerbesserungsvorschläge und Feedback gerne unter https://github.com/sgruendel/alexa-weather-cams/issues/new.",
           "smallIconUri": "file://assets/small_icon.png",
           "largeIconUri": "file://assets/large_icon.png",
-          "updatesDescription": "Neue Kameras in Lindenberg und auf der Wasserkuppe."
+          "updatesDescription": "Die Bildschirmdarstellung wurde auf Alexa Presentation Language (APL) umgestellt und für aktuelle Echo-Show-Geräte einschließlich Echo Show 5 optimiert."
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Aktuelle Bilder siehe https://www.dwd.de/DE/wetter/wetterundklima_vorort/wetterkameras/wetter_cams.html\n\nÄnderungen gegenüber vorheriger Version (Lambda Version 19):\n* Neue Kameras in Lindenberg und auf der Wasserkuppe",
+      "testingInstructions": "Aktuelle Bilder siehe https://www.dwd.de/DE/wetter/wetterundklima_vorort/wetterkameras/wetter_cams.html\n\nTest auf einem Echo Show 5:\n\"Alexa, frage Wetterkamera nach Wasserkuppe.\"\nErwartet wird das aktuelle Kamerabild mit dem Titel \"Wasserkuppe Südwest\" und der Quellenangabe \"Quelle: Deutscher Wetterdienst\".\n\nMit \"Alexa, weiter\" und \"Alexa, zurück\" kann zwischen den Kameras gewechselt werden.",
       "category": "WEATHER",
       "distributionCountries": []
     },
@@ -33,10 +33,6 @@
           "uri": "arn:aws:lambda:eu-west-1:467353799488:function:weatherCams"
         },
         "interfaces": [
-          {
-            "minimumTemplateVersion": "1.0",
-            "type": "RENDER_TEMPLATE"
-          },
           {
             "type": "ALEXA_PRESENTATION_APL",
             "supportedViewports": [

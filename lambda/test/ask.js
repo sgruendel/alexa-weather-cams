@@ -35,7 +35,7 @@ export function verifyTurns(turns, expectations) {
             expect(directives.some(d => d.type.startsWith('Dialog.'))).to.equal(false);
         }
         if (expected.screen) {
-            expect(directives.some(d => ['Alexa.Presentation.APL.RenderDocument', 'Display.RenderTemplate'].includes(d.type))).to.equal(true);
+            expect(directives.some(d => d.type === 'Alexa.Presentation.APL.RenderDocument')).to.equal(true);
             expect(response).not.to.have.property('shouldEndSession');
         }
         if (expected.endSession !== undefined) expect(response.shouldEndSession).to.equal(expected.endSession);

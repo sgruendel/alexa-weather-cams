@@ -12,7 +12,7 @@ export function presentCamera(handlerInput, camera) {
             token: `camera-${handlerInput.requestEnvelope.request.requestId}`,
             document: {
                 type: 'APL',
-                version: '1.0',
+                version: '1.1',
                 theme: 'dark',
                 mainTemplate: {
                     parameters: ['camera'],
@@ -37,13 +37,6 @@ export function presentCamera(handlerInput, camera) {
             },
             datasources: { camera: { name: camera.name, url: baseUrl + '816.jpg', attribution: COPYRIGHT } },
         });
-    } else if (interfaces.Display) {
-        const image = new Alexa.ImageHelper().withDescription(COPYRIGHT)
-            .addImageInstance(baseUrl + '400.jpg', 'X_SMALL', 400, 225)
-            .addImageInstance(baseUrl + '640.jpg', 'SMALL', 640, 360)
-            .addImageInstance(baseUrl + '816.jpg', 'MEDIUM', 816, 459)
-            .getImage();
-        builder.addRenderTemplateDirective({ type: 'BodyTemplate7', backButton: 'HIDDEN', image, title: camera.name });
     } else {
         builder.withShouldEndSession(true);
     }
