@@ -1,2 +1,3 @@
 [tools]
 node = "24"
+"npm:ask-cli" = "2.30.7"

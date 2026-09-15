@@ -1,10 +1,14 @@
 import { expect } from 'chai';
 import { cameras, cameraCatalog, resolveCamera } from '../../cameras.js';
 import { resolvedSlot } from '../helpers/alexa.js';
+import sourceModel from '../../../skill-package/interactionModels/custom/de-DE.json' with { type: 'json' };
 
 const slot = (spoken, ids) => resolvedSlot('webcam', spoken, ids.map(id => ({ id })));
 const hamburg = ['Hamburg-SO', 'Hamburg-SW'];
 describe('camera resolution', () => {
+    it('packages the current interaction-model catalog with the Lambda', () => {
+        expect(cameras).to.deep.equal(cameraCatalog(sourceModel));
+    });
     it('uses the named slot type and validates the catalog', () => {
         expect(cameraCatalog({ interactionModel: { languageModel: { types: [
             { name: 'OTHER', values: [] }, { name: 'LIST_OF_WEBCAMS', values: cameras },

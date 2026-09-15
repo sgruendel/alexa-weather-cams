@@ -67,7 +67,7 @@ describe('Wetterkamera Skill', () => {
     it('shows the previous webcam for Hamburg Südost', async () => {
         const webcam = resolvedSlot('webcam', 'Hamburg Südost', [{ name: 'Hamburg Südost', id: 'Hamburg-SO' }]);
 
-        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { Display: {} } });
+        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { 'Alexa.Presentation.APL': {} } });
         const first = await handler(request, {});
         expectWebcamResponse(first, 'Hamburg Südost', 'Hamburg-SO', true);
 
@@ -82,7 +82,7 @@ describe('Wetterkamera Skill', () => {
         const webcam = resolvedSlot(
             'webcam', 'Warnemünde Nordwest', [{ name: 'Warnemünde Nordwest', id: 'Warnemuende-NW' }]);
 
-        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { Display: {} } });
+        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { 'Alexa.Presentation.APL': {} } });
         const first = await handler(request, {});
         expectWebcamResponse(first, 'Warnemünde Nordwest', 'Warnemuende-NW', true);
 
@@ -104,7 +104,7 @@ describe('Wetterkamera Skill', () => {
     it('shows the next webcam for Hamburg Südost', async () => {
         const webcam = resolvedSlot('webcam', 'Hamburg Südost', [{ name: 'Hamburg Südost', id: 'Hamburg-SO' }]);
 
-        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { Display: {} } });
+        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { 'Alexa.Presentation.APL': {} } });
         const first = await handler(request, {});
         expectWebcamResponse(first, 'Hamburg Südost', 'Hamburg-SO', true);
 
@@ -119,7 +119,7 @@ describe('Wetterkamera Skill', () => {
         const webcam = resolvedSlot(
             'webcam', 'Wasserkuppe Südwest', [{ name: 'Wasserkuppe Südwest', id: 'Wasserkuppe-SW' }]);
 
-        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { Display: {} } });
+        const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', { supportedInterfaces: { 'Alexa.Presentation.APL': {} } });
         const first = await handler(request, {});
         expectWebcamResponse(first, 'Wasserkuppe Südwest', 'Wasserkuppe-SW', true);
 
