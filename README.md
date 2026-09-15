@@ -22,7 +22,7 @@ See [TESTING.md](TESTING.md) for individual suites, coverage, CI, deployed Alexa
 
 For deployment, copy `lambda/.env.example` to `lambda/.env` and set `SKILL_ID`.
 The deployed Lambda must provide the same environment variable. The local `.env` is ignored by Git.
-Run `npm run skill:deploy` from `lambda/` to deploy both the Lambda and skill manifest. Deploying only
+Run `mise exec -- npm run skill:deploy` from `lambda/` to deploy both the Lambda and skill manifest. Deploying only
 the Lambda or interaction model does not enable the APL interface that an Echo Show needs to render
 the camera image.
 

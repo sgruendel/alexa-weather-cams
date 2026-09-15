@@ -34,15 +34,15 @@ It runs separately from ordinary PR tests so an upstream outage does not fail of
 
 From `lambda/`, copy `.env.example` to `.env` and set `SKILL_ID` for deployed tests.
 The deployed Lambda must provide the same environment variable. The local `.env` is ignored by Git.
-The project installs ASK CLI through Mise. Run `ask configure` to authenticate the `default` profile
+The project installs ASK CLI through Mise. Run `mise exec -- ask configure` to authenticate the `default` profile
 with the developer account that owns the skill. Set `ASK_PROFILE` when using another profile for e2e
 tests. In the Alexa developer console, select the skill's **Test** tab and enable testing for **Development**;
 enable the development skill for the same account in the Alexa app when testing devices.
 
 Deployed tests validate the code, interaction model, and manifest already deployed to Alexa, not an
 undeployed working tree. A Lambda-only or interaction-model-only deployment does not enable APL. Deploy
-the complete project from `lambda/` with `npm run skill:deploy` so that Alexa receives the manifest's APL
-interface and supported viewports as well as the Lambda code. Then run `npm run test:e2e`. Each replay has isolated
+the complete project from `lambda/` with `mise exec -- npm run skill:deploy` so that Alexa receives the manifest's APL
+interface and supported viewports as well as the Lambda code. Then run `mise exec -- npm run test:e2e`. Each replay has isolated
 temporary input/output files, validates every completed turn, and allows at most two attempts for
 incomplete simulation output or the known transient “An unexpected error occurred.” response.
 Subprocesses are killed after 35 seconds per attempt, within an 80-second total budget and 90-second
