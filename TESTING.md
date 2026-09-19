@@ -32,12 +32,14 @@ It runs separately from ordinary PR tests so an upstream outage does not fail of
 
 ## Deployed Alexa dialogs
 
-From `lambda/`, copy `.env.example` to `.env` and set `SKILL_ID` for deployed tests.
-The deployed Lambda must provide the same environment variable. The local `.env` is ignored by Git.
-The project installs ASK CLI through Mise. Run `ask configure` to authenticate the `default` profile
-with the developer account that owns the skill. Set `ASK_PROFILE` when using another profile for e2e
-tests. In the Alexa developer console, select the skill's **Test** tab and enable testing for **Development**;
-enable the development skill for the same account in the Alexa app when testing devices.
+From `lambda/`, copy `.env.example` to `.env`, set `SKILL_ID`, and set `ASK_PROFILE` to a dedicated,
+non-default ASK CLI test profile. The profile is required; the e2e runner never falls back to `default`,
+so the default account can remain enabled for **Live** testing. In the Alexa developer console, enable
+**Development** testing for the dedicated profile's account. Enable the development skill for that same
+account in the Alexa app when testing devices.
+
+The deployed Lambda only needs `SKILL_ID`, and the local `.env` is ignored by Git. Deployment uses the
+ASK CLI `default` profile; `ASK_PROFILE` is used only by deployed-skill tests.
 
 Deployed tests validate the code, interaction model, and manifest already deployed to Alexa, not an
 undeployed working tree. A Lambda-only or interaction-model-only deployment does not enable APL. Deploy

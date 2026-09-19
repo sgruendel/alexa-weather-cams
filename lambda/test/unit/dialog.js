@@ -4,8 +4,10 @@ import { access, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
-import { parseDialogOutput, runDialog } from '../helpers/dialog.js';
+import { parseDialogOutput, runDialog as runDialogBase } from '../helpers/dialog.js';
 import { verifyTurns } from '../ask.js';
+
+const runDialog = (replayFile, options = {}) => runDialogBase(replayFile, { profile: 'test-profile', ...options });
 
 const successfulTurn = (caption = 'OK') => ({
     status: 'SUCCESSFUL',
@@ -51,6 +53,7 @@ describe('dialog runner', () => {
         const turns = await runDialog(replayFile, { skillId: 'test-skill', run: fakeRun(output(successfulTurn('First'), successfulTurn('Last')), (command, args, options) => {
             expect(command).to.equal('ask');
             expect(args[args.indexOf('--stage') + 1]).to.equal('development');
+            expect(args[args.indexOf('--profile') + 1]).to.equal('test-profile');
             expect(options.timeout).to.equal(35000);
             expect(options.killSignal).to.equal('SIGKILL');
         }) });
@@ -110,7 +113,10 @@ describe('dialog runner', () => {
         expect(attempts).to.equal(1);
     });
     it('rejects missing configuration before launching ASK', async () => {
-        expect((await rejection(runDialog(replayFile))).message).to.contain('SKILL_ID');
+        expect((await rejection(runDialogBase(replayFile))).message).to.contain('SKILL_ID');
+        expect((await rejection(runDialogBase(replayFile, { skillId: 'test-skill' }))).message).to.contain('ASK_PROFILE');
+        expect((await rejection(runDialogBase(replayFile, { skillId: 'test-skill', profile: 'default' }))).message)
+            .to.contain('non-default');
     });
     it('isolates concurrent replay and output files and preserves source replays', async () => {
         const paths = [];
