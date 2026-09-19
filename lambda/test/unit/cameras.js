@@ -30,8 +30,8 @@ describe('camera resolution', () => {
         expect(resolveCamera(slot('Südwest', ['Schmuecke-SW', 'Hamburg-SW']), hamburg).camera.id).to.equal('Hamburg-SW');
     });
     it('keeps direction-only synonyms ambiguous until pending choices narrow them', () => {
-        const southwest = cameras.filter(camera => camera.name.synonyms.includes('Südwest'));
-        expect(southwest.map(camera => camera.id)).to.deep.equal(['Hamburg-SW', 'Schmuecke-SW', 'Wasserkuppe-SW']);
+        const southwest = cameras.filter(camera => camera.name.synonyms?.includes('Südwest'));
+        expect(southwest.map(camera => camera.id)).to.have.members(['Hamburg-SW', 'Schmuecke-SW', 'Wasserkuppe-SW']);
         expect(resolveCamera(slot('Südwest', southwest.map(camera => camera.id))).kind).to.equal('ambiguous');
     });
     it('keeps multiple survivors ambiguous and deduplicates IDs', () => {

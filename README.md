@@ -20,10 +20,10 @@ npm test
 
 See [TESTING.md](TESTING.md) for individual suites, coverage, CI, deployed Alexa setup, and device checks.
 
-For deployment and e2e tests, copy `lambda/.env.example` to `lambda/.env`, set `SKILL_ID`, and set
-`ASK_PROFILE` to a dedicated, non-default ASK CLI test profile. The deployed Lambda only needs `SKILL_ID`.
-The local `.env` is ignored by Git. Deployment always uses the ASK CLI `default` profile; `ASK_PROFILE`
-is used only by deployed-skill tests.
+For deployment, copy `lambda/.env.example` to `lambda/.env` and set `SKILL_ID`. For e2e tests, also set
+`ASK_PROFILE` to a dedicated, non-default ASK CLI test profile. The deployed Lambda only needs `SKILL_ID`,
+and the local `.env` is ignored by Git. Deployment always uses the ASK CLI `default` profile;
+`ASK_PROFILE` is used only by deployed-skill tests.
 Run `npm run skill:deploy` from `lambda/` to deploy both the Lambda and skill manifest. Deploying only
 the Lambda or interaction model does not enable the APL interface that an Echo Show needs to render
 the camera image. The command initializes ASK CLI's ignored project state from `SKILL_ID` and refuses
