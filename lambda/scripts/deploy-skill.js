@@ -32,7 +32,7 @@ export function ensureAskState(statesFile, profile, skillId) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === sourceFile) {
-    const profile = process.env.ASK_PROFILE ?? 'default';
+    const profile = 'default';
     const projectRoot = resolve(dirname(sourceFile), '../..');
     ensureAskState(resolve(projectRoot, '.ask/ask-states.json'), profile, SKILL_ID);
 

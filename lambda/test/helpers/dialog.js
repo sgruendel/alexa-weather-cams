@@ -55,10 +55,13 @@ export async function runDialog(replayFile, {
     attemptTimeoutMs = 35000,
     retryDelayMs = 1000,
     maxAttempts = 2,
-    profile = 'default',
+    profile,
 } = {}) {
     if (!Number.isInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 2) throw new Error('maxAttempts must be 1 or 2');
     if (!skillId) throw new Error('SKILL_ID is required for deployed Alexa tests');
+    if (!profile || profile === 'default') {
+        throw new Error('ASK_PROFILE must name a dedicated, non-default profile for deployed Alexa tests');
+    }
     const replay = JSON.parse(await readFile(replayFile, 'utf8'));
     if (!Array.isArray(replay.userInput) || replay.userInput.some(input => typeof input !== 'string')) {
         throw new Error('A replay must contain a userInput array of strings');

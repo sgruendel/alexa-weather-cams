@@ -44,6 +44,6 @@ export function verifyTurns(turns, expectations) {
 }
 
 export async function verifyDialog(replayFile, expectations) {
-    const turns = await runDialog(replayFile, { skillId: process.env.SKILL_ID, profile: process.env.ASK_PROFILE ?? 'default' });
+    const turns = await runDialog(replayFile, { skillId: process.env.SKILL_ID, profile: process.env.ASK_PROFILE });
     verifyTurns(turns, expectations);
 }
