@@ -2,6 +2,13 @@ import Alexa from 'ask-sdk-core';
 
 export const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
 
+function screenImageUrl(cameraId, dwdUrl) {
+    const proxy = process.env.IMAGE_PROXY_BASE_URL?.replace(/\/+$/, '');
+    if (!proxy) return dwdUrl;
+    const cacheKey = Math.floor(Date.now() / 60000);
+    return `${proxy}/${cameraId}/816.jpg?v=${cacheKey}`;
+}
+
 export function presentCamera(handlerInput, camera) {
     const baseUrl = `https://opendata.dwd.de/weather/webcam/${camera.id}/${camera.id}_latest_`;
     const interfaces = Alexa.getSupportedInterfaces(handlerInput.requestEnvelope);
@@ -35,7 +42,13 @@ export function presentCamera(handlerInput, camera) {
                     }],
                 },
             },
-            datasources: { camera: { name: camera.name, url: baseUrl + '816.jpg', attribution: COPYRIGHT } },
+            datasources: {
+                camera: {
+                    name: camera.name,
+                    url: screenImageUrl(camera.id, baseUrl + '816.jpg'),
+                    attribution: COPYRIGHT,
+                },
+            },
         });
     } else {
         builder.withShouldEndSession(true);

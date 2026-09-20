@@ -16,6 +16,7 @@ const logger = winston.createLogger({
 });
 
 import { resolveCamera, adjacentCamera } from './cameras.js';
+import { isHttpRequest, proxyCameraImage } from './image-proxy.js';
 import { presentCamera as getResponseFor } from './presentation.js';
 
 const languageStrings = {
@@ -197,6 +198,10 @@ const LocalizationInterceptor = {
 let skill;
 
 export const handler = async function (event, context) {
+    if (isHttpRequest(event)) {
+        return proxyCameraImage(event);
+    }
+
     if (!skill) {
         skill = Alexa.SkillBuilders.custom()
             .addRequestHandlers(
