@@ -1,6 +1,6 @@
 import { cameras } from './cameras.js';
+import { DWD_WEBCAM_BASE_URL } from './config.js';
 
-const DWD_BASE_URL = 'https://opendata.dwd.de/weather/webcam';
 const ALLOWED_SIZES = new Set(['816']);
 const CORS_HEADERS = {
     'access-control-allow-origin': '*',
@@ -33,7 +33,7 @@ export async function proxyCameraImage(event, fetchImage = fetch) {
     }
 
     const [, cameraId, size] = match;
-    const source = `${DWD_BASE_URL}/${cameraId}/${cameraId}_latest_${size}.jpg`;
+    const source = `${DWD_WEBCAM_BASE_URL}/${cameraId}/${cameraId}_latest_${size}.jpg`;
     let upstream;
     try {
         upstream = await fetchImage(source, {

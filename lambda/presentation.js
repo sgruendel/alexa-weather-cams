@@ -1,5 +1,7 @@
 import Alexa from 'ask-sdk-core';
 
+import { DWD_WEBCAM_BASE_URL } from './config.js';
+
 export const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
 
 function screenImageUrl(cameraId, dwdUrl) {
@@ -10,7 +12,7 @@ function screenImageUrl(cameraId, dwdUrl) {
 }
 
 export function presentCamera(handlerInput, camera) {
-    const baseUrl = `https://opendata.dwd.de/weather/webcam/${camera.id}/${camera.id}_latest_`;
+    const baseUrl = `${DWD_WEBCAM_BASE_URL}/${camera.id}/${camera.id}_latest_`;
     const interfaces = Alexa.getSupportedInterfaces(handlerInput.requestEnvelope);
     const builder = handlerInput.responseBuilder;
     if (interfaces['Alexa.Presentation.APL']) {
