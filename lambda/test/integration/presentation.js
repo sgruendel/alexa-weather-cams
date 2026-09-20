@@ -61,6 +61,23 @@ describe('screen presentation and session continuity', () => {
             expect(result.response.directives[0]).to.include({ type: 'Dialog.ElicitSlot', slotToElicit: 'webcam' });
         }
     });
+    it('uses the configured CORS image proxy for APL only', async () => {
+        const previous = process.env.IMAGE_PROXY_BASE_URL;
+        process.env.IMAGE_PROXY_BASE_URL = 'https://example.lambda-url.eu-west-1.on.aws/image/';
+        try {
+            const request = intentRequest('WeatherCamIntent', { webcam }, 'COMPLETED', {
+                supportedInterfaces: { 'Alexa.Presentation.APL': {} },
+            });
+            const { response } = await handler(request, {});
+            expect(response.directives[0].datasources.camera.url)
+                .to.match(/^https:\/\/example\.lambda-url\.eu-west-1\.on\.aws\/image\/Hamburg-SW\/816\.jpg\?v=\d+$/);
+            expect(response.card.image.largeImageUrl)
+                .to.equal('https://opendata.dwd.de/weather/webcam/Hamburg-SW/Hamburg-SW_latest_180.jpg');
+        } finally {
+            if (previous === undefined) delete process.env.IMAGE_PROXY_BASE_URL;
+            else process.env.IMAGE_PROXY_BASE_URL = previous;
+        }
+    });
 });
 
 describe('ambiguous camera follow-up regression', () => {
