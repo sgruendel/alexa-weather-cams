@@ -1,5 +1,5 @@
 import { cameras } from './cameras.js';
-import { DWD_WEBCAM_BASE_URL } from './config.js';
+import { DWD_WEBCAM_BASE_URL } from './dwd.js';
 
 const ALLOWED_SIZES = new Set(['816']);
 const CORS_HEADERS = {

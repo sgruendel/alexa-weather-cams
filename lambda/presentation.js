@@ -1,6 +1,6 @@
 import Alexa from 'ask-sdk-core';
 
-import { DWD_WEBCAM_BASE_URL } from './config.js';
+import { DWD_WEBCAM_BASE_URL } from './dwd.js';
 
 export const COPYRIGHT = 'Quelle: Deutscher Wetterdienst';
 
