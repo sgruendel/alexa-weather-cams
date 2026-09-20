@@ -20,6 +20,14 @@ function response(statusCode, headers = {}, body = '') {
     };
 }
 
+async function cancelBody(body) {
+    try {
+        await body?.cancel();
+    } catch {
+        // Cleanup must not replace the proxy response.
+    }
+}
+
 export async function proxyCameraImage(event, fetchImage = fetch) {
     const method = event.requestContext.http.method;
     if (method === 'OPTIONS') return response(204);
@@ -47,7 +55,7 @@ export async function proxyCameraImage(event, fetchImage = fetch) {
 
     const contentType = upstream.headers.get('content-type') ?? '';
     if (!upstream.ok || !/^image\/jpeg(?:;|$)/i.test(contentType)) {
-        await upstream.body?.cancel();
+        await cancelBody(upstream.body);
         return response(502);
     }
 
@@ -56,7 +64,7 @@ export async function proxyCameraImage(event, fetchImage = fetch) {
         'cache-control': 'public, max-age=60',
     };
     if (method === 'HEAD') {
-        await upstream.body?.cancel();
+        await cancelBody(upstream.body);
         return response(200, headers);
     }
 

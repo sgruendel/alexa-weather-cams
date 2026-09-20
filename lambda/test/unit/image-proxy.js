@@ -80,4 +80,23 @@ describe('APL image proxy', () => {
         }));
         expect(badBody.statusCode).to.equal(502);
     });
+
+    it('does not let stream cleanup failures replace proxy responses', async () => {
+        const rejectingBody = { cancel: async () => { throw new Error('cancel failed'); } };
+        const invalid = await proxyCameraImage(request(), async () => ({
+            ok: false,
+            headers: new Headers({ 'content-type': 'text/plain' }),
+            body: rejectingBody,
+        }));
+        expect(invalid.statusCode).to.equal(502);
+        expect(invalid.headers['access-control-allow-origin']).to.equal('*');
+
+        const head = await proxyCameraImage(request('HEAD'), async () => ({
+            ok: true,
+            headers: new Headers({ 'content-type': 'image/jpeg' }),
+            body: rejectingBody,
+        }));
+        expect(head.statusCode).to.equal(200);
+        expect(head.headers['access-control-allow-origin']).to.equal('*');
+    });
 });
