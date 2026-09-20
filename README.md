@@ -31,11 +31,9 @@ to deploy if an existing state file targets a different skill.
 
 APL devices fetch images directly and require the image server to permit cross-origin requests. The DWD
 image server does not return a CORS header, so the skill exposes a restricted image proxy through the
-existing Lambda. After deploying the Lambda code, run `npm run image-proxy:configure` once. This creates
-a public Lambda Function URL, grants URL-only public invocation, and adds its `/image/` URL to the
-function's `IMAGE_PROXY_BASE_URL` environment variable. The handler accepts only known camera IDs and
-the 816-pixel JPEG used by APL. Re-running the command is safe and preserves the other Lambda environment
-variables, including the required `SKILL_ID`.
+existing Lambda. Configure a public Function URL with URL-only invocation permission, then set the Lambda
+environment variable `IMAGE_PROXY_BASE_URL` to its `/image/` URL. The handler accepts only known camera
+IDs and the 816-pixel JPEG used by APL.
 
 The APL manifest and document follow Amazon's
 [viewport configuration](https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/apl-select-the-viewport-profiles-your-skill-supports.html)

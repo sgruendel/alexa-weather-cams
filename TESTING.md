@@ -39,14 +39,13 @@ so the default account can remain enabled for **Live** testing. In the Alexa dev
 account in the Alexa app when testing devices.
 
 The local `.env` is ignored by Git. Deployment uses the ASK CLI `default` profile; `ASK_PROFILE` is used
-only by deployed-skill tests. The Lambda environment requires `SKILL_ID`; the one-time proxy setup below
-adds `IMAGE_PROXY_BASE_URL` while preserving it.
+only by deployed-skill tests. The Lambda environment requires `SKILL_ID` and `IMAGE_PROXY_BASE_URL`.
 
 Physical APL devices require external image responses to include a CORS header. The DWD image endpoint
-does not include one, so run `npm run image-proxy:configure` after the first Lambda deployment. Confirm
-that the printed URL returns `access-control-allow-origin: *` for a known path such as
-`image/Schmuecke-SW/816.jpg`. The Lambda environment must contain the printed URL as
-`IMAGE_PROXY_BASE_URL`; otherwise the skill falls back to the direct DWD URL for local and contract tests.
+does not include one, so configure a public Function URL for the Lambda with URL-only invocation permission.
+Set `IMAGE_PROXY_BASE_URL` to the Function URL followed by `/image/`, then confirm that a known path such as
+`Schmuecke-SW/816.jpg` returns `access-control-allow-origin: *`. Without this environment variable, the
+skill falls back to the direct DWD URL for local and contract tests.
 
 Deployed tests validate the code, interaction model, and manifest already deployed to Alexa, not an
 undeployed working tree. A Lambda-only or interaction-model-only deployment does not enable APL. Deploy
