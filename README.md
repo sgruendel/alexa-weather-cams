@@ -1,6 +1,7 @@
 # alexa-weather-cams
 
 [![CI](https://github.com/sgruendel/alexa-weather-cams/actions/workflows/node.js.yaml/badge.svg?branch=master)](https://github.com/sgruendel/alexa-weather-cams/actions/workflows/node.js.yaml)
+[![Depfu](https://badges.depfu.com/badges/b8f06fe17133c715afb81c201937f472/count.svg)](https://depfu.com/github/sgruendel/alexa-weather-cams?project_id=33665)
 [![Node.js 24](https://img.shields.io/badge/Node.js-24-339933?logo=nodedotjs&logoColor=white)](mise.toml)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 
