@@ -9,6 +9,8 @@ describe('offline isolation', () => {
         expect(error.code).to.equal('ENETUNREACH');
         let fetchError;
         try { await fetch('https://example.com'); } catch (error) { fetchError = error; }
-        expect(fetchError?.message).to.contain('Disallowed net connect');
+        const networkError = fetchError?.cause ?? fetchError;
+        expect(networkError?.code).to.equal('ENETUNREACH');
+        expect(networkError?.message).to.contain('Disallowed net connect');
     });
 });
