@@ -38,7 +38,7 @@
   "dependencies": {
     "ask-sdk-core": "^2.14.0",
     "ask-sdk-model": "^1.86.0",
-    "i18next": "^26.5.11",
+    "i18next": "^26.7.1",
     "i18next-sprintf-postprocessor": "^0.2.2",
     "winston": "^3.19.0"
   },
@@ -46,8 +46,8 @@
     "@eslint/js": "^10.0.1",
     "c8": "^12.0.0",
     "chai": "^6.3.0",
-    "eslint": "^10.13.0",
-    "globals": "^17.13.0",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
     "mocha": "^12.0.3",
     "nock": "^15.0.5"
   },
